@@ -24,7 +24,7 @@
             padding: 20px;
         }
 
-        /* Botão Menu Hambúrguer */
+        /* Botão Menu Hambúrguer - no topo */
         .menu-toggle {
             position: fixed;
             top: 20px;
@@ -151,15 +151,17 @@
         .main-header {
             background: white;
             border-radius: 15px;
-            padding: 15px 20px;
-            margin-bottom: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            margin-top: 0px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             text-align: center;
         }
 
         .data-atual {
-            font-size: 1em;
+            font-size: 1.1em;
             color: #666;
+            font-weight: 500;
         }
 
         /* Dashboard */
@@ -172,7 +174,7 @@
 
         .card-dashboard {
             background: white;
-            padding: 20px;
+            padding: 25px;
             border-radius: 15px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             text-align: center;
@@ -185,13 +187,13 @@
 
         .card-dashboard h3 {
             color: #666;
-            font-size: 0.85em;
+            font-size: 0.9em;
             text-transform: uppercase;
             margin-bottom: 10px;
         }
 
         .card-dashboard .valor {
-            font-size: 2em;
+            font-size: 2.2em;
             font-weight: bold;
         }
 
@@ -389,33 +391,37 @@
             padding: 8px 15px;
         }
 
-        /* Estilo melhorado para navegação do mês */
+        /* Estilo profissional para navegação do mês */
         .mes-navegacao {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
-            padding: 10px 20px;
+            padding: 15px 25px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
 
         .mes-navegacao button {
-            background: white;
+            background: rgba(255,255,255,0.95);
             color: #667eea;
             border: none;
-            padding: 12px 24px;
+            padding: 12px 28px;
             border-radius: 10px;
             cursor: pointer;
             font-weight: bold;
             font-size: 16px;
             transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .mes-navegacao button:hover {
             transform: scale(1.05);
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            background: white;
         }
 
         .mes-destaque {
@@ -423,19 +429,37 @@
             flex: 1;
         }
 
-        .mes-destaque span:first-child {
-            font-size: 1.2em;
-            color: rgba(255,255,255,0.9);
-            letter-spacing: 2px;
+        .mes-destaque .mes-label {
+            font-size: 0.9em;
+            color: rgba(255,255,255,0.85);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 500;
         }
 
-        .mes-destaque span:last-child {
+        .mes-destaque .mes-nome {
             font-size: 1.8em;
             font-weight: bold;
             color: white;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
             display: block;
             margin-top: 5px;
+        }
+
+        .mes-destaque .mes-ano {
+            font-size: 1em;
+            color: rgba(255,255,255,0.8);
+            margin-top: 3px;
+        }
+
+        /* Indicador de meses sem lançamentos */
+        .sem-lancamentos {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            background: #f9fafb;
+            border-radius: 10px;
+            font-size: 1.1em;
         }
 
         /* Categoria com apenas ícones */
@@ -491,7 +515,11 @@
                 font-size: 12px;
             }
 
-            .mes-destaque span:last-child {
+            .mes-navegacao button span {
+                display: none;
+            }
+
+            .mes-destaque .mes-nome {
                 font-size: 1.2em;
             }
         }
@@ -552,15 +580,15 @@
         <div id="secaoDashboard" class="secao active">
             <div class="dashboard">
                 <div class="card-dashboard receitas">
-                    <h3>Total de Receitas</h3>
+                    <h3>Receitas do Mês</h3>
                     <div class="valor" id="totalReceitas">R$ 0,00</div>
                 </div>
                 <div class="card-dashboard despesas">
-                    <h3>Total de Despesas</h3>
+                    <h3>Despesas do Mês</h3>
                     <div class="valor" id="totalDespesas">R$ 0,00</div>
                 </div>
                 <div class="card-dashboard saldo">
-                    <h3>Saldo Total</h3>
+                    <h3>Saldo do Mês</h3>
                     <div class="valor" id="saldoTotal">R$ 0,00</div>
                 </div>
             </div>
@@ -595,7 +623,7 @@
                         <option value="receber">📈 Receita</option>
                         <option value="pagar">📉 Despesa</option>
                     </select>
-                    <input type="date" id="data">
+                    <input type="date" id="data" value="">
                     <button onclick="adicionar()">Adicionar Lançamento</button>
                 </div>
             </div>
@@ -606,14 +634,19 @@
             <div class="card">
                 <h3>📅 Lançamentos por Mês</h3>
                 
-                <!-- Navegação do Mês Melhorada -->
+                <!-- Navegação do Mês Profissional -->
                 <div class="mes-navegacao">
-                    <button onclick="navegarMes(-1)">◀ Mês anterior</button>
+                    <button onclick="navegarMes(-1)">
+                        <span>◀</span> <span>Anterior</span>
+                    </button>
                     <div class="mes-destaque">
-                        <span>MÊS ATUAL</span>
-                        <span id="mesAtual"></span>
+                        <div class="mes-label">MÊS ATUAL</div>
+                        <div class="mes-nome" id="mesNome"></div>
+                        <div class="mes-ano" id="mesAno"></div>
                     </div>
-                    <button onclick="navegarMes(1)">Próximo mês ▶</button>
+                    <button onclick="navegarMes(1)">
+                        <span>Próximo</span> <span>▶</span>
+                    </button>
                 </div>
 
                 <div class="tabela-container">
@@ -756,17 +789,23 @@
 
         function verificarLembretes() {
             const hoje = new Date();
+            const mesAtual = hoje.getMonth();
+            const anoAtual = hoje.getFullYear();
+            
             const lembretes = dados.filter(item => {
+                const dataItem = new Date(item.data);
                 if (item.tipo === 'pagar' && item.status !== 'pago') {
-                    const diffDias = Math.ceil((new Date(item.data) - hoje) / (1000 * 60 * 60 * 24));
-                    return diffDias >= 0 && diffDias <= 5;
+                    const diffDias = Math.ceil((dataItem - hoje) / (1000 * 60 * 60 * 24));
+                    return diffDias >= 0 && diffDias <= 5 && 
+                           dataItem.getMonth() === mesAtual && 
+                           dataItem.getFullYear() === anoAtual;
                 }
                 return false;
             });
             
             const lista = document.getElementById('lembretesLista');
             if (lembretes.length === 0) {
-                lista.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">Nenhum lembrete pendente</div>';
+                lista.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">Nenhum lembrete pendente para este mês</div>';
                 return;
             }
             
@@ -784,11 +823,20 @@
         }
 
         function atualizarDashboard() {
+            const hoje = new Date();
+            const mesAtual = hoje.getMonth();
+            const anoAtual = hoje.getFullYear();
+            
             let totalReceitas = 0, totalDespesas = 0;
+            
             dados.forEach(item => {
-                if (item.tipo === 'receber') totalReceitas += item.valor;
-                else totalDespesas += item.valor;
+                const dataItem = new Date(item.data);
+                if (dataItem.getMonth() === mesAtual && dataItem.getFullYear() === anoAtual) {
+                    if (item.tipo === 'receber') totalReceitas += item.valor;
+                    else totalDespesas += item.valor;
+                }
             });
+            
             document.getElementById('totalReceitas').innerHTML = formatarMoeda(totalReceitas);
             document.getElementById('totalDespesas').innerHTML = formatarMoeda(totalDespesas);
             document.getElementById('saldoTotal').innerHTML = formatarMoeda(totalReceitas - totalDespesas);
@@ -804,8 +852,19 @@
                        dataItem.getMonth() === mesSelecionado.getMonth();
             });
             
+            // Atualizar cabeçalho do mês
+            const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
+                          'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+            document.getElementById('mesNome').innerHTML = meses[mesSelecionado.getMonth()];
+            document.getElementById('mesAno').innerHTML = mesSelecionado.getFullYear();
+            
             if (dadosMes.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Nenhum lançamento encontrado</td></tr>';
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 40px;">
+                    <div class="sem-lancamentos">
+                        📭 Nenhum lançamento encontrado para ${meses[mesSelecionado.getMonth()]} de ${mesSelecionado.getFullYear()}
+                        <br><small>Clique em "Adicionar Lançamento" no menu para começar</small>
+                    </div>
+                </td></tr>`;
                 return;
             }
             
@@ -832,9 +891,6 @@
                     </td>
                 `;
             });
-            
-            const nomeMes = mesSelecionado.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
-            document.getElementById('mesAtual').innerHTML = nomeMes.charAt(0).toUpperCase() + nomeMes.slice(1);
         }
 
         function editarLancamento(index) {
@@ -852,6 +908,7 @@
                         atualizarTabela();
                         atualizarDashboard();
                         verificarLembretes();
+                        gerarRelatorio();
                         mostrarAlerta('Lançamento editado!', 'success');
                     }
                 }
@@ -882,6 +939,7 @@
             atualizarTabela();
             atualizarDashboard();
             verificarLembretes();
+            gerarRelatorio();
             
             document.getElementById('descricao').value = '';
             document.getElementById('valor').value = '';
@@ -898,6 +956,7 @@
                 atualizarTabela();
                 atualizarDashboard();
                 verificarLembretes();
+                gerarRelatorio();
                 mostrarAlerta('Removido!', 'success');
             }
         }
@@ -924,6 +983,7 @@
                 return;
             }
             
+            let totalGeral = 0;
             resultadosDiv.innerHTML = `
                 <h4>Resultados (${filtrados.length} itens)</h4>
                 ${filtrados.map(item => `
