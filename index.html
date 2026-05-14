@@ -3,8 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Controle Financeiro</title>
+    <title>GastoFácil - Sistema de Controle Financeiro</title>
     <style>
+        :root {
+            --dark-blue: #1a365d;
+            --primary-blue: #0077b6;
+            --light-teal: #00b4d8;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -16,7 +22,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             overflow-x: hidden;
-            padding-bottom: 80px; /* Espaço para o anúncio fixo */
+            padding-bottom: 80px;
         }
 
         .container {
@@ -148,6 +154,40 @@
             display: block;
         }
 
+        /* Logo no Header */
+        .logo-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+
+        .logo-icon-small {
+            width: 50px;
+            height: 50px;
+        }
+
+        .logo-text-group {
+            text-align: left;
+        }
+
+        .logo-brand-name {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--dark-blue);
+            line-height: 1;
+            margin: 0;
+        }
+
+        .logo-tagline {
+            font-size: 12px;
+            color: #666;
+            margin: 2px 0 0 0;
+            font-weight: 500;
+        }
+
         /* Header com data */
         .main-header {
             background: white;
@@ -163,6 +203,7 @@
             font-size: 1.1em;
             color: #666;
             font-weight: 500;
+            margin-top: 10px;
         }
 
         /* Dashboard */
@@ -607,6 +648,10 @@
             .anuncio-link {
                 font-size: 0.9em;
             }
+
+            .logo-brand-name {
+                font-size: 22px;
+            }
         }
     </style>
 </head>
@@ -621,8 +666,26 @@
     <!-- Menu Lateral -->
     <div class="side-menu" id="sideMenu">
         <div class="menu-header">
-            <h2>💰 Finanças</h2>
-            <p>Controle Total</p>
+            <!-- Logo no Menu -->
+            <div style="margin-bottom: 15px;">
+                <svg width="60" height="60" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M100 20C70 20 40 35 40 35V90C40 130 100 170 100 170C100 170 160 130 160 90V35C160 35 130 20 100 20Z" 
+                          stroke="url(#gradMenu)" stroke-width="8" fill="white"/>
+                    <path d="M50 120L85 85L110 110L160 50" 
+                          stroke="url(#gradMenu)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M140 50H160V70" stroke="url(#gradMenu)" stroke-width="12" stroke-linecap="round"/>
+                    <circle cx="55" cy="125" r="22" fill="url(#gradMenu)"/>
+                    <text x="55" y="133" text-anchor="middle" fill="white" font-size="24" font-weight="bold">$</text>
+                    <defs>
+                        <linearGradient id="gradMenu" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#0077b6;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#00b4d8;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <h2>GastoFácil</h2>
+            <p>Gerenciamento de Despesas</p>
         </div>
         <ul class="menu-items-side">
             <li class="active" onclick="mostrarSecao('dashboard'); fecharMenu()">
@@ -653,8 +716,29 @@
     <div class="overlay" id="overlay" onclick="fecharMenu()"></div>
 
     <div class="container">
-        <!-- Header com data -->
+        <!-- Header com Logo e data -->
         <div class="main-header">
+            <div class="logo-header">
+                <svg class="logo-icon-small" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M100 20C70 20 40 35 40 35V90C40 130 100 170 100 170C100 170 160 130 160 90V35C160 35 130 20 100 20Z" 
+                          stroke="url(#gradHeader)" stroke-width="8" fill="white"/>
+                    <path d="M50 120L85 85L110 110L160 50" 
+                          stroke="url(#gradHeader)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M140 50H160V70" stroke="url(#gradHeader)" stroke-width="12" stroke-linecap="round"/>
+                    <circle cx="55" cy="125" r="22" fill="url(#gradHeader)"/>
+                    <text x="55" y="133" text-anchor="middle" fill="white" font-size="24" font-weight="bold">$</text>
+                    <defs>
+                        <linearGradient id="gradHeader" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#0077b6;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#00b4d8;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <div class="logo-text-group">
+                    <h1 class="logo-brand-name">GastoFácil</h1>
+                    <p class="logo-tagline">Gerenciamento de Despesas</p>
+                </div>
+            </div>
             <div class="data-atual">
                 <span>📅</span>
                 <span id="dataAtual"></span>
@@ -947,7 +1031,6 @@
                        dataItem.getMonth() === mesSelecionado.getMonth();
             });
             
-            // Atualizar cabeçalho do mês
             const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
                           'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
             document.getElementById('mesNome').innerHTML = meses[mesSelecionado.getMonth()];
@@ -1078,7 +1161,6 @@
                 return;
             }
             
-            let totalGeral = 0;
             resultadosDiv.innerHTML = `
                 <h4>Resultados (${filtrados.length} itens)</h4>
                 ${filtrados.map(item => `
@@ -1159,14 +1241,14 @@
             const url = URL.createObjectURL(dataBlob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `financas_${new Date().toISOString().split('T')[0]}.json`;
+            a.download = `gastofacil_backup_${new Date().toISOString().split('T')[0]}.json`;
             a.click();
             URL.revokeObjectURL(url);
-            mostrarAlerta('Dados exportados!', 'success');
+            mostrarAlerta('Dados exportados com sucesso!', 'success');
         }
 
         function limparTodosDados() {
-            if (confirm('⚠️ ATENÇÃO: Isso irá apagar TODOS os seus dados. Tem certeza?')) {
+            if (confirm('⚠️ ATENÇÃO: Isso irá apagar TODOS os seus dados do GastoFácil. Tem certeza?')) {
                 dados = [];
                 salvar();
                 atualizarTabela();
@@ -1202,11 +1284,15 @@
             });
         }
         
+        // Inicialização
         atualizarData();
         atualizarTabela();
         atualizarDashboard();
         verificarLembretes();
         gerarRelatorio();
+        
+        // Adicionar o logo ao título da página
+        document.title = 'GastoFácil - Controle Financeiro';
     </script>
 </body>
 </html>
