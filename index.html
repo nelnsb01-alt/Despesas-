@@ -16,6 +16,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             overflow-x: hidden;
+            padding-bottom: 80px; /* Espaço para o anúncio fixo */
         }
 
         .container {
@@ -496,6 +497,86 @@
             }
         }
 
+        /* Anúncio Fixo no Rodapé */
+        .anuncio-rodape {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(135deg, #ff6b00 0%, #ff8c00 50%, #ff6b00 100%);
+            background-size: 200% 200%;
+            animation: gradienteAnimado 3s ease infinite;
+            z-index: 1000;
+            padding: 12px 20px;
+            box-shadow: 0 -4px 15px rgba(255, 107, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+            border-top: 3px solid #ffd700;
+        }
+
+        .anuncio-rodape:hover {
+            background: linear-gradient(135deg, #ff7b00 0%, #ff9d00 50%, #ff7b00 100%);
+            box-shadow: 0 -6px 20px rgba(255, 107, 0, 0.6);
+            padding: 14px 20px;
+        }
+
+        .anuncio-link {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .anuncio-icone {
+            font-size: 1.3em;
+            animation: pulsar 1.5s ease infinite;
+        }
+
+        .anuncio-texto {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 15px;
+            border-radius: 20px;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .anuncio-rodape:hover .anuncio-texto {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .anuncio-brilho {
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: brilho 2s infinite;
+        }
+
+        @keyframes gradienteAnimado {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes pulsar {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        @keyframes brilho {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
         @media (max-width: 768px) {
             .form-group {
                 grid-template-columns: 1fr;
@@ -521,6 +602,10 @@
 
             .mes-destaque .mes-nome {
                 font-size: 1.2em;
+            }
+
+            .anuncio-link {
+                font-size: 0.9em;
             }
         }
     </style>
@@ -720,6 +805,16 @@
                 <div id="relatorioConteudo"></div>
             </div>
         </div>
+    </div>
+
+    <!-- Anúncio Fixo no Rodapé -->
+    <div class="anuncio-rodape">
+        <div class="anuncio-brilho"></div>
+        <a href="https://15A.com/?pid=1744505426" target="_blank" class="anuncio-link" rel="noopener noreferrer">
+            <span class="anuncio-icone">🔥</span>
+            <span class="anuncio-texto">Oferta Exclusiva - Clique Aqui e Aproveite!</span>
+            <span class="anuncio-icone">⚡</span>
+        </a>
     </div>
 
     <script>
