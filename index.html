@@ -517,26 +517,26 @@
             display: block;
         }
 
-        .alert {
+        /* Notificações Customizadas */
+        .custom-alert {
             position: fixed;
             top: 20px;
             right: 20px;
-            padding: 15px 20px;
+            padding: 15px 25px;
             border-radius: 8px;
-            z-index: 1002;
-            animation: slideIn 0.3s ease;
+            z-index: 1050;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
         }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+        .custom-alert.show {
+            transform: translateX(0);
         }
+        .alert-success { background-color: #10b981; }
+        .alert-error { background-color: #ef4444; }
+        .alert-info { background-color: #3b82f6; }
 
         /* Anúncio Fixo no Rodapé */
         .anuncio-rodape {
@@ -656,17 +656,16 @@
     </style>
 </head>
 <body>
-    <!-- Botão Menu Hambúrguer -->
-    <button class="menu-toggle" onclick="toggleMenu()">
+    <div id="alertContainer" class="custom-alert"></div>
+
+    <button class="menu-toggle" id="menuToggleBtn" onclick="toggleMenu()">
         <span></span>
         <span></span>
         <span></span>
     </button>
 
-    <!-- Menu Lateral -->
     <div class="side-menu" id="sideMenu">
         <div class="menu-header">
-            <!-- Logo no Menu -->
             <div style="margin-bottom: 15px;">
                 <svg width="60" height="60" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M100 20C70 20 40 35 40 35V90C40 130 100 170 100 170C100 170 160 130 160 90V35C160 35 130 20 100 20Z" 
@@ -712,15 +711,632 @@
         </ul>
     </div>
 
-    <!-- Overlay -->
     <div class="overlay" id="overlay" onclick="fecharMenu()"></div>
 
     <div class="container">
-        <!-- Header com Logo e data -->
         <div class="main-header">
             <div class="logo-header">
                 <svg class="logo-icon-small" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M100 20C70 20 40 35 40 35V90C40 130 100 170 100 170C100 170 160 130 160 90V35C160 35 130 20 100 20Z" 
                           stroke="url(#gradHeader)" stroke-width="8" fill="white"/>
                     <path d="M50 120L85 85L110 110L160 50" 
-                          stroke="url(#gradHeader)" stroke-width="12" stroke
+                          stroke="url(#gradHeader)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+                    <defs>
+                        <linearGradient id="gradHeader" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#0077b6;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#00b4d8;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <div class="logo-text-group">
+                    <h1 class="logo-brand-name">GastoFácil</h1>
+                    <p class="logo-tagline">Controle Financeiro Descomplicado</p>
+                </div>
+            </div>
+            <div class="data-atual" id="dataAtualTxt">--/--/----</div>
+        </div>
+
+        <div id="secao-dashboard" class="secao active">
+            <div class="mes-navegacao">
+                <button onclick="mudarMes(-1)">◀ <span>Mês Anterior</span></button>
+                <div class="mes-destaque">
+                    <span class="mes-label">Visualizando Período</span>
+                    <span class="mes-nome" id="dashMesNome">Janeiro</span>
+                    <span class="mes-ano" id="dashAnoNome">2026</span>
+                </div>
+                <button onclick="mudarMes(1)"><span>Próximo Mês</span> ▶</button>
+            </div>
+
+            <div class="dashboard">
+                <div class="card-dashboard receitas">
+                    <h3>Receitas</h3>
+                    <div class="valor" id="dashReceitas">R$ 0,00</div>
+                </div>
+                <div class="card-dashboard despesas">
+                    <h3>Despesas</h3>
+                    <div class="valor" id="dashDespesas">R$ 0,00</div>
+                </div>
+                <div class="card-dashboard saldo">
+                    <h3>Saldo Corrente</h3>
+                    <div class="valor" id="dashSaldo">R$ 0,00</div>
+                </div>
+            </div>
+
+            <div class="lembretes-panel" id="lembretesPanel" style="display:none;">
+                <h3>🔔 Atenção: Contas Pendentes no Mês</h3>
+                <div id="listaLembretes"></div>
+            </div>
+        </div>
+
+        <div id="secao-adicionar" class="secao">
+            <div class="card">
+                <h3 id="formTitulo">Novo Lançamento</h3>
+                <form id="financeForm" onsubmit="salvarLancamento(event)">
+                    <input type="hidden" id="lancamentoId">
+                    <div class="form-group">
+                        <input type="text" id="descricao" placeholder="Descrição (Ex: Salário, Aluguel...)" required>
+                        <input type="number" step="0.01" id="valor" placeholder="Valor (R$)" required>
+                        <input type="date" id="data" required>
+                    </div>
+                    <div class="form-group">
+                        <select id="tipo" onchange="atualizarCategorias()" required>
+                            <option value="">Selecione o Tipo</option>
+                            <option value="receita">Receita (+)</option>
+                            <option value="despesa">Despesa (-)</option>
+                        </select>
+                        <select id="categoria" required>
+                            <option value="">Selecione a Categoria</option>
+                        </select>
+                        <select id="status" required>
+                            <option value="pago">Pago / Recebido</option>
+                            <option value="pendente">Pendente</option>
+                        </select>
+                    </div>
+                    <button type="submit" id="btnSalvar">Adicionar Registro</button>
+                    <button type="button" id="btnCancelarEdicao" style="display:none; background:#6b7280; margin-top:10px;" onclick="cancelarEdicao()">Cancelar Edição</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="secao-lancamentos" class="secao">
+            <div class="card">
+                <h3>Registros Cadastrados no Período</h3>
+                <div class="tabela-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Descrição</th>
+                                <th>Categoria</th>
+                                <th>Tipo</th>
+                                <th>Valor</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaPrincipalBody">
+                            </tbody>
+                    </table>
+                    <div id="semDadosTabela" class="sem-lancamentos" style="display:none;">
+                        Nenhum lançamento registrado neste mês.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="secao-filtros" class="secao">
+            <div class="card">
+                <h3>Busca e Filtragem Avançada</h3>
+                <div class="filtros-group">
+                    <input type="text" id="filtroTexto" placeholder="Buscar por descrição..." oninput="aplicarFiltrosAvancados()">
+                    <select id="filtroTipo" onchange="aplicarFiltrosAvancados()">
+                        <option value="todos">Todos os Tipos</option>
+                        <option value="receita">Apenas Receitas</option>
+                        <option value="despesa">Apenas Despesas</option>
+                    </select>
+                    <select id="filtroStatus" onchange="aplicarFiltrosAvancados()">
+                        <option value="todos">Todos os Status</option>
+                        <option value="pago">Apenas Pagos</option>
+                        <option value="pendente">Apenas Pendentes</option>
+                    </select>
+                </div>
+                <div class="filtros-acoes">
+                    <button class="limpar" onclick="limparFiltros()">Limpar Filtros</button>
+                </div>
+
+                <div class="tabela-container" style="margin-top:20px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Descrição</th>
+                                <th>Categoria</th>
+                                <th>Tipo</th>
+                                <th>Valor</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaFiltrosBody">
+                            <tr><td colspan="6" style="text-align:center; color:#999;">Utilize os filtros acima para pesquisar.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="secao-relatorio" class="secao">
+            <div class="card">
+                <h3>Análise e Fechamento Contábil</h3>
+                <div class="relatorio-mensal">
+                    <div class="resumo-stats">
+                        <div class="resumo-stat">
+                            <h4>Total Recebido</h4>
+                            <p id="repTotalRecebido" style="color:#10b981; font-weight:bold; font-size:1.4em;">R$ 0,00</p>
+                        </div>
+                        <div class="resumo-stat">
+                            <h4>Total Pago</h4>
+                            <p id="repTotalPago" style="color:#ef4444; font-weight:bold; font-size:1.4em;">R$ 0,00</p>
+                        </div>
+                        <div class="resumo-stat">
+                            <h4>Previsão Pendente (Despesas)</h4>
+                            <p id="repPrevisaoPendente" style="color:#f59e0b; font-weight:bold; font-size:1.4em;">R$ 0,00</p>
+                        </div>
+                    </div>
+                    <div id="relatorioTextoFechamento" style="font-size:1.1em; line-height:1.6; color:#4b5563;">
+                        Carregando informações contábeis...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="anuncio-rodape">
+        <div class="anuncio-brilho"></div>
+        <a href="https://www.google.com" target="_blank" class="anuncio-link">
+            <span class="anuncio-icone">🚀</span>
+            <span class="anuncio-texto">GastoFácil PRO: Desbloqueie relatórios avançados e gráficos exclusivos clicando aqui!</span>
+        </a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // Configurações do Firebase fornecidas por você
+        const firebaseConfig = {
+          apiKey: "AIzaSyAccacBLrvONf4PXDYAhCUoPmZQxi1PJlI",
+          authDomain: "despesas-547a2.firebaseapp.com",
+          projectId: "despesas-547a2",
+          storageBucket: "despesas-547a2.firebasestorage.app",
+          messagingSenderId: "597868249062",
+          appId: "1:597868249062:web:915afcfa0c546396cae027"
+        };
+
+        // Inicializando o Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // VARIÁVEIS DE CONTROLE DE ESTADO GLOBAL
+        let lancamentos Globais = {};
+        let dataAlvo = new Date(2026, 0, 1); // Iniciando em Janeiro de 2026 conforme regras do ano atual
+
+        const mesesNomes = [
+            "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+            "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+        ];
+
+        const categoriasDefinidas = {
+            receita: ["Salário", "Investimentos", "Freelance", "Outros"],
+            despesa: ["Alimentação", "Moradia", "Transporte", "Saúde", "Educação", "Lazer", "Outros"]
+        };
+
+        // INICIALIZAÇÃO DA APLICAÇÃO
+        window.addEventListener('DOMContentLoaded', () => {
+            configurarDataAtual();
+            atualizarInterfaceMes();
+            escutarLancamentosFirebase();
+        });
+
+        // NOTIFICAÇÕES ALERT CUSTOMIZADAS
+        function mostrarNotificacao(mensagem, tipo = 'success') {
+            const container = document.getElementById('alertContainer');
+            container.className = `custom-alert alert-${tipo} show`;
+            container.innerHTML = mensagem;
+            setTimeout(() => {
+                container.classList.remove('show');
+            }, 3500);
+        }
+
+        // FORMATADORES AUXILIARES
+        function formatarMoeda(valor) {
+            return parseFloat(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function formatarDataBR(dataString) {
+            if(!dataString) return "";
+            const partes = dataString.split('-');
+            if(partes.length !== 3) return dataString;
+            return `${partes[2]}/${partes[1]}/${partes[0]}`;
+        }
+
+        function configurarDataAtual() {
+            const hoje = new Date();
+            const formatada = hoje.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('dataAtualTxt').innerText = formatada.charAt(0).toUpperCase() + formatada.slice(1);
+        }
+
+        // NAVEGAÇÃO DOS MESES
+        window.mudarMes = function(direcao) {
+            dataAlvo.setMonth(dataAlvo.getMonth() + direcao);
+            atualizarInterfaceMes();
+            processarDadosEAtualizarTelas();
+        }
+
+        function atualizarInterfaceMes() {
+            const mesCorrente = dataAlvo.getMonth();
+            const anoCorrente = dataAlvo.getFullYear();
+            
+            document.getElementById('dashMesNome').innerText = mesesNomes[mesCorrente];
+            document.getElementById('dashAnoNome').innerText = anoCorrente;
+        }
+
+        // ESCUTAR MUDANÇAS DO FIREBASE EM TEMPO REAL
+        function escutarLancamentosFirebase() {
+            const DBRef = ref(db, 'lancamentos');
+            onValue(DBRef, (snapshot) => {
+                const dados = snapshot.val();
+                lancamentosGlobais = dados ? dados : {};
+                processarDadosEAtualizarTelas();
+            }, (error) => {
+                mostrarNotificacao("Erro de permissão ou conexão ao carregar dados do Firebase.", "error");
+                console.error(error);
+            });
+        }
+
+        // MAPEAMENTO E CÁLCULO FINANCEIRO DO MÊS ATUAL
+        function processarDadosEAtualizarTelas() {
+            const mesFiltro = (dataAlvo.getMonth() + 1).toString().padStart(2, '0');
+            const anoFiltro = dataAlvo.getFullYear().toString();
+
+            let totalReceitas = 0;
+            let totalDespesas = 0;
+            let totalRecebido = 0;
+            let totalPago = 0;
+            let previsaoPendenteDespesa = 0;
+
+            const listaFiltradaMes = [];
+            const lembretesPendentes = [];
+
+            // Varre o objeto retornado do Firebase
+            Object.keys(lancamentosGlobais).forEach(id => {
+                const item = lancamentosGlobais[id];
+                const dataItem = item.data; // Formato YYYY-MM-DD
+                if (dataItem) {
+                    const [ano, mes] = dataItem.split('-');
+                    if (ano === anoFiltro && mes === mesFiltro) {
+                        const cloneItem = { id, ...item };
+                        listaFiltradaMes.push(cloneItem);
+
+                        const valorNum = parseFloat(cloneItem.valor) || 0;
+
+                        if (cloneItem.tipo === 'receita') {
+                            totalReceitas += valorNum;
+                            if (cloneItem.status === 'pago') totalRecebido += valorNum;
+                        } else if (cloneItem.tipo === 'despesa') {
+                            totalDespesas += valorNum;
+                            if (cloneItem.status === 'pago') totalPago += valorNum;
+                            if (cloneItem.status === 'pendente') {
+                                previsaoPendenteDespesa += valorNum;
+                                lembretesPendentes.push(cloneItem);
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 1. Renderiza Dashboard Principal
+            document.getElementById('dashReceitas').innerText = formatarMoeda(totalReceitas);
+            document.getElementById('dashDespesas').innerText = formatarMoeda(totalDespesas);
+            const saldo = totalReceitas - totalDespesas;
+            const elementoSaldo = document.getElementById('dashSaldo');
+            elementoSaldo.innerText = formatarMoeda(saldo);
+            elementoSaldo.style.color = saldo >= 0 ? '#3b82f6' : '#ef4444';
+
+            // 2. Renderiza Lembretes
+            const painelLembretes = document.getElementById('lembretesPanel');
+            const listaLembretesHTML = document.getElementById('listaLembretes');
+            if (lembretesPendentes.length > 0) {
+                painelLembretes.style.display = 'block';
+                listaLembretesHTML.innerHTML = lembretesPendentes.map(item => `
+                    <div class="lembrete-item">
+                        <span><strong>${item.descricao}</strong> (${item.categoria}) - Vence em: ${formatarDataBR(item.data)}</span>
+                        <span style="color:#ef4444; font-weight:bold;">${formatarMoeda(item.valor)}</span>
+                    </div>
+                `).join('');
+            } else {
+                painelLembretes.style.display = 'none';
+            }
+
+            // 3. Renderiza Tabela Principal do Mês
+            renderizarTabelaPrincipal(listaFiltradaMes);
+
+            // 4. Renderiza Relatório do Período
+            document.getElementById('repTotalRecebido').innerText = formatarMoeda(totalRecebido);
+            document.getElementById('repTotalPago').innerText = formatarMoeda(totalPago);
+            document.getElementById('repPrevisaoPendente').innerText = formatarMoeda(previsaoPendenteDespesa);
+
+            const fechamentoTexto = document.getElementById('relatorioTextoFechamento');
+            if(listaFiltradaMes.length === 0) {
+                fechamentoTexto.innerHTML = "Nenhum movimento registrado para análise contábil estruturada neste período.";
+            } else {
+                fechamentoTexto.innerHTML = `
+                    No mês de <strong>${mesesNomes[dataAlvo.getMonth()]} de ${dataAlvo.getFullYear()}</strong>, o sistema computou um volume operacional bruto de entradas de 
+                    ${formatarMoeda(totalReceitas)}, contrapondo as despesas que somaram ${formatarMoeda(totalDespesas)}. 
+                    Isso gerou um saldo final consolidado de <strong style="color: ${saldo >= 0 ? '#3b82f6':'#ef4444'};">${formatarMoeda(saldo)}</strong>.<br><br>
+                    Até o presente momento, você possui o equivalente a <strong>${formatarMoeda(previsaoPendenteDespesa)}</strong> em compromissos pendentes de quitação.
+                `;
+            }
+
+            // Atualiza os Filtros Avançados dinamicamente se houver filtros aplicados
+            aplicarFiltrosAvancados();
+        }
+
+        // RENDERIZAÇÃO DA TABELA DE LANÇAMENTOS POR MÊS
+        function renderizarTabelaPrincipal(lista) {
+            const tbody = document.getElementById('tabelaPrincipalBody');
+            const placeholder = document.getElementById('semDadosTabela');
+
+            if(lista.length === 0) {
+                tbody.innerHTML = "";
+                placeholder.style.display = "block";
+                return;
+            }
+
+            placeholder.style.display = "none";
+            // Ordenando por data decrescente
+            lista.sort((a,b) => new Date(b.data) - new Date(a.data));
+
+            tbody.innerHTML = lista.map(item => `
+                <tr>
+                    <td>${formatarDataBR(item.data)}</td>
+                    <td>${item.descricao}</td>
+                    <td>${item.categoria}</td>
+                    <td style="font-weight:600; color:${item.tipo === 'receita' ? '#10b981':'#ef4444'}">${item.tipo.toUpperCase()}</td>
+                    <td style="font-weight:bold;">${formatarMoeda(item.valor)}</td>
+                    <td>
+                        <button class="status-badge ${item.status === 'pago' ? 'status-pago':'status-pendente'}" data-id="${item.id}" onclick="alternarStatusDoLancamento('${item.id}', '${item.status}')">
+                            ${item.status === 'pago' ? 'Pago' : 'Pendente'}
+                        </button>
+                    </td>
+                    <td>
+                        <button class="edit-btn" onclick="carregarLancamentoParaEdicao('${item.id}')">Editar</button>
+                        <button class="delete-btn" onclick="deletarLancamento('${item.id}')">Excluir</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ALTERNAR STATUS (PAGO/PENDENTE) DIRETAMENTE NA TABELA
+        window.alternarStatusDoLancamento = function(id, statusAtual) {
+            const novoStatus = statusAtual === 'pago' ? 'pendente' : 'pago';
+            const itemRef = ref(db, `lancamentos/${id}`);
+            update(itemRef, { status: novoStatus })
+            .then(() => mostrarNotificacao("Status atualizado com sucesso!"))
+            .catch(() => mostrarNotificacao("Erro ao alterar status no banco de dados.", "error"));
+        }
+
+        // SALVAR OU ATUALIZAR LANÇAMENTO NO FIREBASE
+        window.salvarLancamento = function(e) {
+            e.preventDefault();
+
+            const id = document.getElementById('lancamentoId').value;
+            const dadosForm = {
+                descricao: document.getElementById('descricao').value.trim(),
+                valor: parseFloat(document.getElementById('valor').value),
+                data: document.getElementById('data').value,
+                tipo: document.getElementById('tipo').value,
+                categoria: document.getElementById('categoria').value,
+                status: document.getElementById('status').value
+            };
+
+            if(!dadosForm.tipo || !dadosForm.categoria) {
+                mostrarNotificacao("Por favor, preencha o Tipo e a Categoria.", "error");
+                return;
+            }
+
+            if(id) {
+                // Modo Edição
+                const itemRef = ref(db, `lancamentos/${id}`);
+                set(itemRef, dadosForm)
+                .then(() => {
+                    mostrarNotificacao("Lançamento atualizado com sucesso!");
+                    cancelarEdicao();
+                    mostrarSecao('lancamentos');
+                }).catch(() => mostrarNotificacao("Erro ao atualizar dados.", "error"));
+            } else {
+                // Modo Criação
+                const colecaoRef = ref(db, 'lancamentos');
+                const novoRegistroRef = push(colecaoRef);
+                set(novoRegistroRef, dadosForm)
+                .then(() => {
+                    mostrarNotificacao("Lançamento gravado com sucesso!");
+                    document.getElementById('financeForm').reset();
+                    mostrarSecao('lancamentos');
+                }).catch(() => mostrarNotificacao("Erro ao salvar no Firebase.", "error"));
+            }
+        }
+
+        // EDICAO DE REGISTROS
+        window.carregarLancamentoParaEdicao = function(id) {
+            const item = lancamentosGlobais[id];
+            if(!item) return;
+
+            document.getElementById('lancamentoId').value = id;
+            document.getElementById('descricao').value = item.descricao;
+            document.getElementById('valor').value = item.valor;
+            document.getElementById('data').value = item.data;
+            document.getElementById('tipo').value = item.tipo;
+            
+            atualizarCategorias();
+            document.getElementById('categoria').value = item.categoria;
+            document.getElementById('status').value = item.status;
+
+            document.getElementById('formTitulo').innerText = "Editando Lançamento";
+            document.getElementById('btnSalvar').innerText = "Salvar Alterações";
+            document.getElementById('btnCancelarEdicao').style.display = "inline-block";
+
+            mostrarSecao('adicionar');
+        }
+
+        window.cancelarEdicao = function() {
+            document.getElementById('lancamentoId').value = "";
+            document.getElementById('financeForm').reset();
+            document.getElementById('formTitulo').innerText = "Novo Lançamento";
+            document.getElementById('btnSalvar').innerText = "Adicionar Registro";
+            document.getElementById('btnCancelarEdicao').style.display = "none";
+            atualizarCategorias();
+        }
+
+        // DELETAR LANÇAMENTO
+        window.deletarLancamento = function(id) {
+            if(confirm("Tem certeza que deseja remover permanentemente este registro?")) {
+                const itemRef = ref(db, `lancamentos/${id}`);
+                remove(itemRef)
+                .then(() => mostrarNotificacao("Registro removido com sucesso!", "info"))
+                .catch(() => mostrarNotificacao("Erro ao tentar excluir.", "error"));
+            }
+        }
+
+        // LIMPAR TUDO (EVICT ALL DO FIREBASE)
+        window.limparTodosDados = function() {
+            if(confirm("ATENÇÃO: Isso apagará TODOS os registros armazenados no Firebase do projeto. Confirma?")) {
+                const tudoRef = ref(db, 'lancamentos');
+                set(tudoRef, null)
+                .then(() => {
+                    mostrarNotificacao("Toda a base de dados foi resetada.", "info");
+                    mostrarSecao('dashboard');
+                }).catch(() => mostrarNotificacao("Falha de autenticação ou segurança.", "error"));
+            }
+        }
+
+        // ATUALIZAÇÃO COMBINADA DAS CATEGORIAS DO FORMULÁRIO
+        window.atualizarCategorias = function() {
+            const tipo = document.getElementById('tipo').value;
+            const selectCat = document.getElementById('categoria');
+            
+            selectCat.innerHTML = '<option value="">Selecione a Categoria</option>';
+            if(tipo && categoriasDefinidas[tipo]) {
+                categoriasDefinidas[tipo].forEach(cat => {
+                    selectCat.innerHTML += `<option value="${cat}">${cat}</option>`;
+                });
+            }
+        }
+        window.atualizarCategorias(); // Carga inicial vazia
+
+        // FILTROS AVANÇADOS (PROCURA GLOBAL OU POR PARÂMETRO)
+        window.aplicarFiltrosAvancados = function() {
+            const secaoFiltros = document.getElementById('secao-filtros');
+            if (!secaoFiltros.classList.contains('active')) return;
+
+            const texto = document.getElementById('filtroTexto').value.toLowerCase();
+            const tipo = document.getElementById('filtroTipo').value;
+            const status = document.getElementById('filtroStatus').value;
+            const tbody = document.getElementById('tabelaFiltrosBody');
+
+            const filtrados = [];
+
+            Object.keys(lancamentosGlobais).forEach(id => {
+                const item = lancamentosGlobais[id];
+                const condTexto = !texto || item.descricao.toLowerCase().includes(texto) || item.categoria.toLowerCase().includes(texto);
+                const condTipo = tipo === 'todos' || item.tipo === tipo;
+                const condStatus = status === 'todos' || item.status === status;
+
+                if (condTexto && condTipo && condStatus) {
+                    filtrados.push(item);
+                }
+            });
+
+            if(filtrados.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#999;">Nenhum resultado correspondente localizado.</td></tr>`;
+                return;
+            }
+
+            filtrados.sort((a,b) => new Date(b.data) - new Date(a.data));
+            tbody.innerHTML = filtrados.map(item => `
+                <tr>
+                    <td>${formatarDataBR(item.data)}</td>
+                    <td>${item.descricao}</td>
+                    <td>${item.categoria}</td>
+                    <td style="font-weight:600; color:${item.tipo === 'receita' ? '#10b981':'#ef4444'}">${item.tipo.toUpperCase()}</td>
+                    <td style="font-weight:bold;">${formatarMoeda(item.valor)}</td>
+                    <td>
+                        <span class="status-badge ${item.status === 'pago' ? 'status-pago':'status-pendente'}">
+                            ${item.status === 'pago' ? 'Pago' : 'Pendente'}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        window.limparFiltros = function() {
+            document.getElementById('filtroTexto').value = "";
+            document.getElementById('filtroTipo').value = "todos";
+            document.getElementById('filtroStatus').value = "todos";
+            aplicarFiltrosAvancados();
+        }
+
+        // EXPORTAR DADOS (DOWNLOAD JSON)
+        window.exportarDados = function() {
+            if(Object.keys(lancamentosGlobais).length === 0) {
+                mostrarNotificacao("Não existem dados disponíveis para exportação.", "error");
+                return;
+            }
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(lancamentosGlobais, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `gastofacil_backup_2026.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            mostrarNotificacao("Arquivo JSON gerado e baixado!", "success");
+        }
+
+        // CONTROLE VISUAL DE NAVEGAÇÃO DE SEÇÕES E MENU SIDEBAR
+        window.mostrarSecao = function(secaoId) {
+            document.querySelectorAll('.secao').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(`secao-${secaoId}`).classList.add('active');
+
+            // Atualiza estados na barra de menu ativo
+            const indexMapeamento = { 'dashboard': 0, 'adicionar': 1, 'lancamentos': 2, 'filtros': 3, 'relatorio': 4 };
+            const listaItensMenu = document.querySelectorAll('.menu-items-side li');
+            
+            listaItensMenu.forEach(li => li.classList.remove('active'));
+            if(indexMapeamento[secaoId] !== undefined) {
+                listaItensMenu[indexMapeamento[secaoId]].classList.add('active');
+            }
+
+            // Se for a tela de filtros, roda o filtro inicialmente
+            if(secaoId === 'filtros') {
+                aplicarFiltrosAvancados();
+            }
+        }
+
+        window.toggleMenu = function() {
+            const menu = document.getElementById('sideMenu');
+            const toggle = document.getElementById('menuToggleBtn');
+            const overlay = document.getElementById('overlay');
+            
+            menu.classList.toggle('open');
+            toggle.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        window.fecharMenu = function() {
+            document.getElementById('sideMenu').classList.remove('open');
+            document.getElementById('menuToggleBtn').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+        }
+    </script>
+</body>
+</html>
