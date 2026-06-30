@@ -3,57 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GastoFácil - Firebase</title>
+    <title>GastoFácil - Controle Total</title>
     <style>
-        :root { --primary: #667eea; --secondary: #764ba2; }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: sans-serif; background: linear-gradient(135deg, var(--primary), var(--secondary)); min-height: 100vh; padding: 20px; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; }
-        .card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; }
-        .valor { font-size: 1.8rem; font-weight: bold; margin-top: 10px; }
-        #val-receitas { color: #10b981; }
-        #val-despesas { color: #ef4444; }
-        #val-saldo { color: #3b82f6; }
-        .form-group input, .form-group select { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; }
-        button { width: 100%; padding: 15px; border: none; border-radius: 8px; background: #333; color: white; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        table { width: 100%; margin-top: 20px; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
-        .btn-excluir { background: #ff4d4d; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; }
+        body { font-family: sans-serif; background: #f4f7f6; padding: 20px; color: #333; }
+        .card { background: white; border-radius: 10px; padding: 15px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; }
+        .valor { font-size: 1.5rem; font-weight: bold; margin-top: 5px; }
+        .receita { color: #28a745; }
+        .despesa { color: #dc3545; }
+        input, select, button { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { background: #007bff; color: white; border: none; font-weight: bold; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; font-size: 13px; }
+        th, td { border: 1px solid #eee; padding: 10px; text-align: left; }
+        .btn-del { background: #ff4d4d; color: white; border: none; padding: 5px; border-radius: 4px; width: 30px; }
     </style>
 </head>
 <body>
 
-<div class="container">
     <div class="card">
-        <h1>GastoFácil</h1>
-        <p>Controle Financeiro</p>
+        <h2>GastoFácil</h2>
     </div>
 
     <div class="card">
-        <h3>Receitas</h3>
-        <div id="val-receitas" class="valor">R$ 0,00</div>
+        <div>Receitas</div>
+        <div id="display-receitas" class="valor receita">R$ 0,00</div>
     </div>
     <div class="card">
-        <h3>Despesas</h3>
-        <div id="val-despesas" class="valor">R$ 0,00</div>
+        <div>Despesas</div>
+        <div id="display-despesas" class="valor despesa">R$ 0,00</div>
     </div>
     <div class="card">
-        <h3>Saldo Atual</h3>
-        <div id="val-saldo" class="valor">R$ 0,00</div>
+        <div>Saldo</div>
+        <div id="display-saldo" class="valor">R$ 0,00</div>
     </div>
 
     <div class="card">
-        <h3>Novo Lançamento</h3>
-        <div class="form-group">
-            <input type="text" id="desc" placeholder="Descrição">
-            <input type="number" id="valor" placeholder="Valor R$">
-            <input type="date" id="data">
-            <select id="tipo">
-                <option value="receita">Receita</option>
-                <option value="despesa">Despesa</option>
-            </select>
-            <button onclick="salvar()">Salvar</button>
-        </div>
+        <input type="text" id="desc" placeholder="Descrição">
+        <input type="number" id="val" placeholder="Valor R$">
+        <input type="date" id="data">
+        <select id="tipo">
+            <option value="receita">Receita</option>
+            <option value="despesa">Despesa</option>
+        </select>
+        <button onclick="enviar()">Salvar Lançamento</button>
     </div>
 
     <table>
@@ -61,13 +52,12 @@
             <tr>
                 <th>Data</th>
                 <th>Desc.</th>
-                <th>Valor</th>
-                <th>Ação</th>
+                <th>R$</th>
+                <th></th>
             </tr>
         </thead>
-        <tbody id="tabela"></tbody>
+        <tbody id="tabela-corpo"></tbody>
     </table>
-</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
@@ -85,48 +75,60 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const dbRef = ref(db, 'transacoes');
+    const transRef = ref(db, 'transacoes');
 
-    window.salvar = () => {
+    // Função para Salvar
+    window.enviar = function() {
         const d = document.getElementById('desc').value;
-        const v = parseFloat(document.getElementById('valor').value);
+        const v = parseFloat(document.getElementById('val').value);
         const dt = document.getElementById('data').value;
         const t = document.getElementById('tipo').value;
 
-        if(!d || !v || !dt) return alert("Preencha tudo!");
+        if(!d || isNaN(v) || !dt) {
+            alert("Preencha todos os campos!");
+            return;
+        }
 
-        push(dbRef, { d, v, dt, t }).then(() => {
+        push(transRef, { d: d, v: v, dt: dt, t: t }).then(function() {
             document.getElementById('desc').value = "";
-            document.getElementById('valor').value = "";
+            document.getElementById('val').value = "";
         });
     };
 
-    onValue(dbRef, (snapshot) => {
+    // Função para Ler e Atualizar a Tela
+    onValue(transRef, function(snapshot) {
         const data = snapshot.val();
-        let totalR = 0, totalD = 0, html = "";
-        
-        if(data) {
-            Object.keys(data).forEach(id => {
+        let rec = 0;
+        let des = 0;
+        let html = "";
+
+        if (data) {
+            for (let id in data) {
                 const item = data[id];
-                if(item.t === 'receita') totalR += item.v; else totalD += item.v;
+                if (item.t === 'receita') rec += item.v; else des += item.v;
+
+                const cor = item.t === 'receita' ? 'green' : 'red';
                 
                 html += "<tr>" +
                     "<td>" + item.dt + "</td>" +
                     "<td>" + item.d + "</td>" +
-                    "<td style='color:" + (item.t === 'receita' ? 'green' : 'red') + "'>R$ " + item.v.toFixed(2) + "</td>" +
-                    "<td><button class='btn-excluir' onclick=\"excluir('" + id + "')\">X</button></td>" +
+                    "<td style='color:" + cor + "'>R$ " + item.v.toFixed(2) + "</td>" +
+                    "<td><button class='btn-del' onclick=\"apagar('" + id + "')\">X</button></td>" +
                 "</tr>";
-            });
+            }
         }
 
-        document.getElementById('tabela').innerHTML = html;
-        document.getElementById('val-receitas').innerText = "R$ " + totalR.toFixed(2);
-        document.getElementById('val-despesas').innerText = "R$ " + totalD.toFixed(2);
-        document.getElementById('val-saldo').innerText = "R$ " + (totalR - totalD).toFixed(2);
+        document.getElementById('tabela-corpo').innerHTML = html;
+        document.getElementById('display-receitas').innerText = "R$ " + rec.toFixed(2);
+        document.getElementById('display-despesas').innerText = "R$ " + des.toFixed(2);
+        document.getElementById('display-saldo').innerText = "R$ " + (rec - des).toFixed(2);
     });
 
-    window.excluir = (id) => { if(confirm("Excluir?")) remove(ref(db, 'transacoes/' + id)); };
+    window.apagar = function(id) {
+        if(confirm("Excluir este item?")) {
+            remove(ref(db, 'transacoes/' + id));
+        }
+    };
 </script>
-
 </body>
 </html>
