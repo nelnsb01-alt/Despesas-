@@ -3,118 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GastoFácil - Sistema de Controle Financeiro</title>
+    <title>GastoFácil - Firebase</title>
     <style>
-        :root {
-            --dark-blue: #1a365d;
-            --primary-blue: #0077b6;
-            --light-teal: #00b4d8;
-        }
+        :root { --primary: #667eea; --secondary: #764ba2; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding-bottom: 80px;
-        }
-        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-        .main-header {
-            background: white; border-radius: 15px; padding: 20px;
-            margin-bottom: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        .dashboard {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px; margin-bottom: 30px;
-        }
-        .card-dashboard {
-            background: white; padding: 25px; border-radius: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1); text-align: center;
-        }
-        .card-dashboard.receitas .valor { color: #10b981; }
-        .card-dashboard.despesas .valor { color: #ef4444; }
-        .card-dashboard.saldo .valor { color: #3b82f6; }
-        .valor { font-size: 2.2em; font-weight: bold; }
-        .card { background: white; border-radius: 15px; padding: 25px; margin-bottom: 20px; }
-        .form-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        input, select, button { padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; }
-        button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; cursor: pointer; font-weight: bold; width: 100%; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
-        .status-badge { padding: 5px 12px; border-radius: 20px; border: none; cursor: pointer; font-size: 0.8em; }
-        .status-pago { background: #d1fae5; color: #065f46; }
-        .status-pendente { background: #fee2e2; color: #991b1b; }
-        .delete-btn { background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
+        body { font-family: sans-serif; background: linear-gradient(135deg, var(--primary), var(--secondary)); min-height: 100vh; padding: 20px; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; }
+        .card { background: white; border-radius: 15px; padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; }
+        .valor { font-size: 1.8rem; font-weight: bold; margin-top: 10px; }
+        #val-receitas { color: #10b981; }
+        #val-despesas { color: #ef4444; }
+        #val-saldo { color: #3b82f6; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; }
+        button { width: 100%; padding: 15px; border: none; border-radius: 8px; background: #333; color: white; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        table { width: 100%; margin-top: 20px; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
+        .btn-excluir { background: #ff4d4d; color: white; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="main-header">
+    <div class="card">
         <h1>GastoFácil</h1>
-        <p>Sistema de Controle Financeiro</p>
+        <p>Controle Financeiro</p>
     </div>
 
-    <div class="dashboard">
-        <div class="card-dashboard receitas">
-            <h3>Receitas</h3>
-            <div class="valor">R$ 0,00</div>
-        </div>
-        <div class="card-dashboard despesas">
-            <h3>Despesas</h3>
-            <div class="valor">R$ 0,00</div>
-        </div>
-        <div class="card-dashboard saldo">
-            <h3>Saldo Atual</h3>
-            <div class="valor">R$ 0,00</div>
-        </div>
+    <div class="card">
+        <h3>Receitas</h3>
+        <div id="val-receitas" class="valor">R$ 0,00</div>
+    </div>
+    <div class="card">
+        <h3>Despesas</h3>
+        <div id="val-despesas" class="valor">R$ 0,00</div>
+    </div>
+    <div class="card">
+        <h3>Saldo Atual</h3>
+        <div id="val-saldo" class="valor">R$ 0,00</div>
     </div>
 
     <div class="card">
         <h3>Novo Lançamento</h3>
         <div class="form-group">
-            <input type="text" id="descricao" placeholder="Descrição">
-            <input type="number" id="valor" placeholder="Valor (R$)">
+            <input type="text" id="desc" placeholder="Descrição">
+            <input type="number" id="valor" placeholder="Valor R$">
             <input type="date" id="data">
-            <select id="categoria">
-                <option value="Alimentação">Alimentação</option>
-                <option value="Lazer">Lazer</option>
-                <option value="Salário">Salário</option>
-                <option value="Saúde">Saúde</option>
-                <option value="Outros">Outros</option>
-            </select>
             <select id="tipo">
-                <option value="despesa">Despesa</option>
                 <option value="receita">Receita</option>
+                <option value="despesa">Despesa</option>
             </select>
+            <button onclick="salvar()">Salvar</button>
         </div>
-        <button onclick="salvarTransacao()">Salvar Lançamento</button>
     </div>
 
-    <div class="card">
-        <h3>Histórico</h3>
-        <div style="overflow-x: auto;">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Descrição</th>
-                        <th>Categoria</th>
-                        <th>Valor</th>
-                        <th>Status</th>
-                        <th>Ação</th>
-                    </tr>
-                </thead>
-                <tbody id="tabela-corpo"></tbody>
-            </table>
-        </div>
-    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Desc.</th>
+                <th>Valor</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody id="tabela"></tbody>
+    </table>
 </div>
 
 <script type="module">
-    // Importando SDKs via CDN oficial documentada nas fontes do Firebase
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue, remove } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyAccacBLrvONf4PXDYAhCUoPmZQxi1PJlI",
@@ -128,79 +85,48 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const transacoesRef = ref(db, 'transacoes');
+    const dbRef = ref(db, 'transacoes');
 
-    // Salvar dados no Firebase
-    window.salvarTransacao = () => {
-        const descricao = document.getElementById('descricao').value;
-        const valor = parseFloat(document.getElementById('valor').value);
-        const data = document.getElementById('data').value;
-        const categoria = document.getElementById('categoria').value;
-        const tipo = document.getElementById('tipo').value;
+    window.salvar = () => {
+        const d = document.getElementById('desc').value;
+        const v = parseFloat(document.getElementById('valor').value);
+        const dt = document.getElementById('data').value;
+        const t = document.getElementById('tipo').value;
 
-        if (!descricao || isNaN(valor) || !data) {
-            alert("Preencha todos os campos corretamente!");
-            return;
-        }
+        if(!d || !v || !dt) return alert("Preencha tudo!");
 
-        push(transacoesRef, {
-            descricao, valor, data, categoria, tipo, status: 'pendente'
-        }).then(() => {
-            alert("Lançamento salvo com sucesso!");
-            document.getElementById('descricao').value = "";
+        push(dbRef, { d, v, dt, t }).then(() => {
+            document.getElementById('desc').value = "";
             document.getElementById('valor').value = "";
-        }).catch(err => alert("Erro ao salvar: " + err.message));
+        });
     };
 
-    // Ler dados em tempo real e atualizar a interface
-    onValue(transacoesRef, (snapshot) => {
+    onValue(dbRef, (snapshot) => {
         const data = snapshot.val();
-        let receitas = 0, despesas = 0;
-        const lista = [];
-
-        if (data) {
+        let totalR = 0, totalD = 0, html = "";
+        
+        if(data) {
             Object.keys(data).forEach(id => {
-                const t = data[id];
-                lista.push({ id, ...t });
-                if (t.tipo === 'receita') receitas += t.valor;
-                else despesas += t.valor;
+                const item = data[id];
+                if(item.t === 'receita') totalR += item.v; else totalD += item.v;
+                
+                html += "<tr>" +
+                    "<td>" + item.dt + "</td>" +
+                    "<td>" + item.d + "</td>" +
+                    "<td style='color:" + (item.t === 'receita' ? 'green' : 'red') + "'>R$ " + item.v.toFixed(2) + "</td>" +
+                    "<td><button class='btn-excluir' onclick=\"excluir('" + id + "')\">X</button></td>" +
+                "</tr>";
             });
         }
 
-        // Dashboard
-        const cardRec = document.querySelector('.receitas .valor');
-        const cardDes = document.querySelector('.despesas .valor');
-        const cardSal = document.querySelector('.saldo .valor');
-        if(cardRec) cardRec.innerText = `R\( \){receitas.toFixed(2)}`;
-        if(cardDes) cardDes.innerText = `R\( \){despesas.toFixed(2)}`;
-        if(cardSal) cardSal.innerText = `R\( \){(receitas - despesas).toFixed(2)}`;
-
-        // Tabela
-        const tbody = document.getElementById('tabela-corpo');
-        if(tbody) {
-            tbody.innerHTML = lista.reverse().map(t => `
-                <tr>
-                    <td>${t.data}</td>
-                    <td>${t.descricao}</td>
-                    <td>${t.categoria}</td>
-                    <td style="color: \({t.tipo === 'receita' ? '#10b981' : '#ef4444'}">R\) ${t.valor.toFixed(2)}</td>
-                    <td>
-                        <button class="status-badge ${t.status === 'pago' ? 'status-pago' : 'status-pendente'}" 
-                                onclick="alterarStatus('\({t.id}', '\){t.status}')">
-                            ${t.status}
-                        </button>
-                    </td>
-                    <td><button class="delete-btn" onclick="deletar('${t.id}')">Excluir</button></td>
-                </tr>
-            `).join('');
-        }
+        document.getElementById('tabela').innerHTML = html;
+        document.getElementById('val-receitas').innerText = "R$ " + totalR.toFixed(2);
+        document.getElementById('val-despesas').innerText = "R$ " + totalD.toFixed(2);
+        document.getElementById('val-saldo').innerText = "R$ " + (totalR - totalD).toFixed(2);
     });
 
-    window.deletar = (id) => { if(confirm("Deseja excluir?")) remove(ref(db, `transacoes/${id}`)); };
-    window.alterarStatus = (id, atual) => {
-        const novo = atual === 'pendente' ? 'pago' : 'pendente';
-        update(ref(db, `transacoes/${id}`), { status: novo });
-    };
+    window.excluir = (id) => { if(confirm("Excluir?")) remove(ref(db, 'transacoes/' + id)); };
 </script>
+
 </body>
 </html>
