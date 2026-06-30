@@ -656,14 +656,17 @@
     </style>
 </head>
 <body>
+    <!-- Container de Alertas Flutuantes -->
     <div id="alertContainer" class="custom-alert"></div>
 
+    <!-- Botão Menu Hambúrguer -->
     <button class="menu-toggle" id="menuToggleBtn" onclick="toggleMenu()">
         <span></span>
         <span></span>
         <span></span>
     </button>
 
+    <!-- Menu Lateral -->
     <div class="side-menu" id="sideMenu">
         <div class="menu-header">
             <div style="margin-bottom: 15px;">
@@ -711,9 +714,11 @@
         </ul>
     </div>
 
+    <!-- Overlay -->
     <div class="overlay" id="overlay" onclick="fecharMenu()"></div>
 
     <div class="container">
+        <!-- Header com Logo e data -->
         <div class="main-header">
             <div class="logo-header">
                 <svg class="logo-icon-small" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -736,6 +741,9 @@
             <div class="data-atual" id="dataAtualTxt">--/--/----</div>
         </div>
 
+        <!-- Seções do Sistema -->
+
+        <!-- 1. DASHBOARD -->
         <div id="secao-dashboard" class="secao active">
             <div class="mes-navegacao">
                 <button onclick="mudarMes(-1)">◀ <span>Mês Anterior</span></button>
@@ -768,6 +776,7 @@
             </div>
         </div>
 
+        <!-- 2. ADICIONAR LANÇAMENTO -->
         <div id="secao-adicionar" class="secao">
             <div class="card">
                 <h3 id="formTitulo">Novo Lançamento</h3>
@@ -798,6 +807,7 @@
             </div>
         </div>
 
+        <!-- 3. LANÇAMENTOS POR MÊS -->
         <div id="secao-lancamentos" class="secao">
             <div class="card">
                 <h3>Registros Cadastrados no Período</h3>
@@ -815,7 +825,8 @@
                             </tr>
                         </thead>
                         <tbody id="tabelaPrincipalBody">
-                            </tbody>
+                            <!-- Inserido dinamicamente -->
+                        </tbody>
                     </table>
                     <div id="semDadosTabela" class="sem-lancamentos" style="display:none;">
                         Nenhum lançamento registrado neste mês.
@@ -824,6 +835,7 @@
             </div>
         </div>
 
+        <!-- 4. FILTROS AVANÇADOS -->
         <div id="secao-filtros" class="secao">
             <div class="card">
                 <h3>Busca e Filtragem Avançada</h3>
@@ -864,6 +876,7 @@
             </div>
         </div>
 
+        <!-- 5. RELATÓRIO MENSAL -->
         <div id="secao-relatorio" class="secao">
             <div class="card">
                 <h3>Análise e Fechamento Contábil</h3>
@@ -891,6 +904,7 @@
 
     </div>
 
+    <!-- Anúncio Fixo no Rodapé -->
     <div class="anuncio-rodape">
         <div class="anuncio-brilho"></div>
         <a href="https://www.google.com" target="_blank" class="anuncio-link">
@@ -899,11 +913,12 @@
         </a>
     </div>
 
+    <!-- SCRIPTS CONFIGURAÇÃO DO FIREBASE (V10 MODULAR COMPATÍVEL VIA CDN) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // Configurações do Firebase fornecidas por você
+        // Configuração original do seu aplicativo Firebase
         const firebaseConfig = {
           apiKey: "AIzaSyAccacBLrvONf4PXDYAhCUoPmZQxi1PJlI",
           authDomain: "despesas-547a2.firebaseapp.com",
@@ -913,13 +928,13 @@
           appId: "1:597868249062:web:915afcfa0c546396cae027"
         };
 
-        // Inicializando o Firebase
+        // Inicializando conexões estruturadas
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
         // VARIÁVEIS DE CONTROLE DE ESTADO GLOBAL
-        let lancamentos Globais = {};
-        let dataAlvo = new Date(2026, 0, 1); // Iniciando em Janeiro de 2026 conforme regras do ano atual
+        let lancamentosGlobais = {};
+        let dataAlvo = new Date(2026, 0, 1); // Alinhado ao ano de 2026
 
         const mesesNomes = [
             "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -942,7 +957,7 @@
         function mostrarNotificacao(mensagem, tipo = 'success') {
             const container = document.getElementById('alertContainer');
             container.className = `custom-alert alert-${tipo} show`;
-            container.innerHTML = mensagem;
+            container.innerHTML = mensaje = mensagem;
             setTimeout(() => {
                 container.classList.remove('show');
             }, 3500);
@@ -989,12 +1004,13 @@
                 lancamentosGlobais = dados ? dados : {};
                 processarDadosEAtualizarTelas();
             }, (error) => {
-                mostrarNotificacao("Erro de permissão ou conexão ao carregar dados do Firebase.", "error");
-                console.error(error);
+                mostrarNotificacao("Erro de sincronização. Verifique suas regras no console do Firebase.", "error");
+                console.error("Erro reportado pelo Firebase Realtime Database:", error.message);
+                console.warn("DICA: Certifique-se de que configurou as regras na aba 'Rules' do painel do Firebase para '.read': true e '.write': true.");
             });
         }
 
-        // MAPEAMENTO E CÁLCULO FINANCEIRO DO MÊS ATUAL
+        // MAPEAMENTO E CÁLCULO FINANCEIRO
         function processarDadosEAtualizarTelas() {
             const mesFiltro = (dataAlvo.getMonth() + 1).toString().padStart(2, '0');
             const anoFiltro = dataAlvo.getFullYear().toString();
@@ -1008,10 +1024,9 @@
             const listaFiltradaMes = [];
             const lembretesPendentes = [];
 
-            // Varre o objeto retornado do Firebase
             Object.keys(lancamentosGlobais).forEach(id => {
                 const item = lancamentosGlobais[id];
-                const dataItem = item.data; // Formato YYYY-MM-DD
+                const dataItem = item.data; 
                 if (dataItem) {
                     const [ano, mes] = dataItem.split('-');
                     if (ano === anoFiltro && mes === mesFiltro) {
@@ -1074,11 +1089,10 @@
                     No mês de <strong>${mesesNomes[dataAlvo.getMonth()]} de ${dataAlvo.getFullYear()}</strong>, o sistema computou um volume operacional bruto de entradas de 
                     ${formatarMoeda(totalReceitas)}, contrapondo as despesas que somaram ${formatarMoeda(totalDespesas)}. 
                     Isso gerou um saldo final consolidado de <strong style="color: ${saldo >= 0 ? '#3b82f6':'#ef4444'};">${formatarMoeda(saldo)}</strong>.<br><br>
-                    Até o presente momento, você possui o equivalente a <strong>${formatarMoeda(previsaoPendenteDespesa)}</strong> em compromissos pendentes de quitação.
+                    Ates o presente momento, você possui o equivalente a <strong>${formatarMoeda(previsaoPendenteDespesa)}</strong> em compromissos pendentes de quitação.
                 `;
             }
 
-            // Atualiza os Filtros Avançados dinamicamente se houver filtros aplicados
             aplicarFiltrosAvancados();
         }
 
@@ -1094,7 +1108,6 @@
             }
 
             placeholder.style.display = "none";
-            // Ordenando por data decrescente
             lista.sort((a,b) => new Date(b.data) - new Date(a.data));
 
             tbody.innerHTML = lista.map(item => `
@@ -1117,16 +1130,16 @@
             `).join('');
         }
 
-        // ALTERNAR STATUS (PAGO/PENDENTE) DIRETAMENTE NA TABELA
+        // ALTERNAR STATUS (PAGO/PENDENTE)
         window.alternarStatusDoLancamento = function(id, statusAtual) {
             const novoStatus = statusAtual === 'pago' ? 'pendente' : 'pago';
             const itemRef = ref(db, `lancamentos/${id}`);
             update(itemRef, { status: novoStatus })
             .then(() => mostrarNotificacao("Status atualizado com sucesso!"))
-            .catch(() => mostrarNotificacao("Erro ao alterar status no banco de dados.", "error"));
+            .catch(() => mostrarNotificacao("Erro de gravação. Verifique as regras do Firebase.", "error"));
         }
 
-        // SALVAR OU ATUALIZAR LANÇAMENTO NO FIREBASE
+        // SALVAR OU ATUALIZAR LANÇAMENTO
         window.salvarLancamento = function(e) {
             e.preventDefault();
 
@@ -1146,16 +1159,14 @@
             }
 
             if(id) {
-                // Modo Edição
                 const itemRef = ref(db, `lancamentos/${id}`);
                 set(itemRef, dadosForm)
                 .then(() => {
                     mostrarNotificacao("Lançamento atualizado com sucesso!");
                     cancelarEdicao();
                     mostrarSecao('lancamentos');
-                }).catch(() => mostrarNotificacao("Erro ao atualizar dados.", "error"));
+                }).catch(() => mostrarNotificacao("Erro de permissão para atualizar dados.", "error"));
             } else {
-                // Modo Criação
                 const colecaoRef = ref(db, 'lancamentos');
                 const novoRegistroRef = push(colecaoRef);
                 set(novoRegistroRef, dadosForm)
@@ -1163,7 +1174,7 @@
                     mostrarNotificacao("Lançamento gravado com sucesso!");
                     document.getElementById('financeForm').reset();
                     mostrarSecao('lancamentos');
-                }).catch(() => mostrarNotificacao("Erro ao salvar no Firebase.", "error"));
+                }).catch(() => mostrarNotificacao("Erro de permissão para salvar no Firebase.", "error"));
             }
         }
 
@@ -1204,11 +1215,11 @@
                 const itemRef = ref(db, `lancamentos/${id}`);
                 remove(itemRef)
                 .then(() => mostrarNotificacao("Registro removido com sucesso!", "info"))
-                .catch(() => mostrarNotificacao("Erro ao tentar excluir.", "error"));
+                .catch(() => mostrarNotificacao("Erro de permissão para excluir no Firebase.", "error"));
             }
         }
 
-        // LIMPAR TUDO (EVICT ALL DO FIREBASE)
+        // LIMPAR TUDO
         window.limparTodosDados = function() {
             if(confirm("ATENÇÃO: Isso apagará TODOS os registros armazenados no Firebase do projeto. Confirma?")) {
                 const tudoRef = ref(db, 'lancamentos');
@@ -1216,11 +1227,11 @@
                 .then(() => {
                     mostrarNotificacao("Toda a base de dados foi resetada.", "info");
                     mostrarSecao('dashboard');
-                }).catch(() => mostrarNotificacao("Falha de autenticação ou segurança.", "error"));
+                }).catch(() => mostrarNotificacao("Falha na gravação. Verifique as regras de segurança.", "error"));
             }
         }
 
-        // ATUALIZAÇÃO COMBINADA DAS CATEGORIAS DO FORMULÁRIO
+        // ATUALIZAÇÃO COMBINADA DAS CATEGORIAS
         window.atualizarCategorias = function() {
             const tipo = document.getElementById('tipo').value;
             const selectCat = document.getElementById('categoria');
@@ -1232,9 +1243,8 @@
                 });
             }
         }
-        window.atualizarCategorias(); // Carga inicial vazia
 
-        // FILTROS AVANÇADOS (PROCURA GLOBAL OU POR PARÂMETRO)
+        // FILTROS AVANÇADOS
         window.aplicarFiltrosAvancados = function() {
             const secaoFiltros = document.getElementById('secao-filtros');
             if (!secaoFiltros.classList.contains('active')) return;
@@ -1286,7 +1296,7 @@
             aplicarFiltrosAvancados();
         }
 
-        // EXPORTAR DADOS (DOWNLOAD JSON)
+        // EXPORTAR DADOS
         window.exportarDados = function() {
             if(Object.keys(lancamentosGlobais).length === 0) {
                 mostrarNotificacao("Não existem dados disponíveis para exportação.", "error");
@@ -1302,12 +1312,11 @@
             mostrarNotificacao("Arquivo JSON gerado e baixado!", "success");
         }
 
-        // CONTROLE VISUAL DE NAVEGAÇÃO DE SEÇÕES E MENU SIDEBAR
+        // NAVEGAÇÃO DE SEÇÕES E MENU SIDEBAR
         window.mostrarSecao = function(secaoId) {
             document.querySelectorAll('.secao').forEach(sec => sec.classList.remove('active'));
             document.getElementById(`secao-${secaoId}`).classList.add('active');
 
-            // Atualiza estados na barra de menu ativo
             const indexMapeamento = { 'dashboard': 0, 'adicionar': 1, 'lancamentos': 2, 'filtros': 3, 'relatorio': 4 };
             const listaItensMenu = document.querySelectorAll('.menu-items-side li');
             
@@ -1316,7 +1325,6 @@
                 listaItensMenu[indexMapeamento[secaoId]].classList.add('active');
             }
 
-            // Se for a tela de filtros, roda o filtro inicialmente
             if(secaoId === 'filtros') {
                 aplicarFiltrosAvancados();
             }
