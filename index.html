@@ -3,60 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GastoFácil</title>
+    <title>GastoFácil - Oficial</title>
     <style>
-        body { font-family: sans-serif; background: #f4f7f6; padding: 20px; color: #333; }
-        .card { background: white; border-radius: 10px; padding: 15px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; }
-        .valor { font-size: 1.5rem; font-weight: bold; margin-top: 5px; }
+        body { font-family: sans-serif; background: #f0f2f5; padding: 15px; color: #333; margin: 0; }
+        .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center; }
+        h2 { margin: 0 0 10px 0; color: #1a365d; }
+        .resumo { display: flex; justify-content: space-around; margin-top: 10px; }
+        .v-box { flex: 1; }
+        .v-label { font-size: 12px; text-transform: uppercase; color: #666; }
+        .valor { font-size: 1.4rem; font-weight: bold; display: block; margin-top: 5px; }
         .receita { color: #28a745; }
         .despesa { color: #dc3545; }
-        input, select, button { width: 100%; padding: 12px; margin: 5px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-        button { background: #007bff; color: white; border: none; font-weight: bold; cursor: pointer; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; font-size: 13px; }
-        th, td { border: 1px solid #eee; padding: 10px; text-align: left; }
-        .btn-del { background: #ff4d4d; color: white; border: none; padding: 5px; border-radius: 4px; width: 30px; }
+        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        button { background: #007bff; color: white; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:active { background: #0056b3; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; border-radius: 10px; overflow: hidden; }
+        th { background: #eee; padding: 10px; font-size: 12px; text-align: left; }
+        td { border-bottom: 1px solid #eee; padding: 12px; font-size: 14px; }
+        .btn-excluir { background: #ff4d4d; color: white; border: none; padding: 6px 10px; border-radius: 5px; width: auto; font-size: 12px; }
     </style>
 </head>
 <body>
 
     <div class="card">
         <h2>GastoFácil</h2>
+        <div class="resumo">
+            <div class="v-box">
+                <span class="v-label">Receitas</span>
+                <span id="tot-r" class="valor receita">R$ 0,00</span>
+            </div>
+            <div class="v-box">
+                <span class="v-label">Despesas</span>
+                <span id="tot-d" class="valor despesa">R$ 0,00</span>
+            </div>
+        </div>
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+        <span class="v-label">Saldo Atual</span>
+        <span id="tot-s" class="valor">R$ 0,00</span>
     </div>
 
     <div class="card">
-        <div>Receitas</div>
-        <div id="display-receitas" class="valor receita">R$ 0,00</div>
-    </div>
-    <div class="card">
-        <div>Despesas</div>
-        <div id="display-despesas" class="valor despesa">R$ 0,00</div>
-    </div>
-    <div class="card">
-        <div>Saldo Atual</div>
-        <div id="display-saldo" class="valor">R$ 0,00</div>
-    </div>
-
-    <div class="card">
-        <input type="text" id="desc" placeholder="Descrição">
-        <input type="number" id="val" placeholder="Valor R$">
-        <input type="date" id="data">
-        <select id="tipo">
-            <option value="receita">Receita</option>
-            <option value="despesa">Despesa</option>
+        <input type="text" id="ipt-desc" placeholder="Ex: Aluguel, Mercado...">
+        <input type="number" id="ipt-val" placeholder="Valor R$">
+        <input type="date" id="ipt-data">
+        <select id="ipt-tipo">
+            <option value="receita">Receita (+)</option>
+            <option value="despesa">Despesa (-)</option>
         </select>
-        <button onclick="enviar()">Salvar Lançamento</button>
+        <button onclick="salvar()">Salvar Lançamento</button>
     </div>
 
     <table>
         <thead>
             <tr>
                 <th>Data</th>
-                <th>Desc.</th>
-                <th>R$</th>
+                <th>Descrição</th>
+                <th>Valor</th>
                 <th></th>
             </tr>
         </thead>
-        <tbody id="tabela-corpo"></tbody>
+        <tbody id="lista-corpo"></tbody>
     </table>
 
 <script type="module">
@@ -75,54 +81,78 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const transRef = ref(db, 'transacoes');
+    const dbRef = ref(db, 'transacoes');
 
-    window.enviar = function() {
-        const d = document.getElementById('desc').value;
-        const v = parseFloat(document.getElementById('val').value);
-        const dt = document.getElementById('data').value;
-        const t = document.getElementById('tipo').value;
+    // Função para Salvar Novo Item
+    window.salvar = function() {
+        const desc = document.getElementById('ipt-desc').value;
+        const valor = parseFloat(document.getElementById('ipt-val').value);
+        const data = document.getElementById('ipt-data').value;
+        const tipo = document.getElementById('ipt-tipo').value;
 
-        if(!d || isNaN(v) || !dt) {
-            alert("Preencha todos os campos!");
+        if(!desc || isNaN(valor) || !data) {
+            alert("Por favor, preencha todos os campos!");
             return;
         }
 
-        push(transRef, { d: d, v: v, dt: dt, t: t }).then(function() {
-            document.getElementById('desc').value = "";
-            document.getElementById('val').value = "";
+        push(dbRef, { 
+            descricao: desc, 
+            valor: valor, 
+            data: data, 
+            tipo: tipo 
+        }).then(function() {
+            document.getElementById('ipt-desc').value = "";
+            document.getElementById('ipt-val').value = "";
+            alert("Salvo com sucesso!");
+        }).catch(function(error) {
+            alert("Erro ao salvar: " + error.message);
         });
     };
 
-    onValue(transRef, function(snapshot) {
-        const data = snapshot.val();
-        let rec = 0;
-        let des = 0;
-        let html = "";
+    // Função para Atualizar a Tela em Tempo Real
+    onValue(dbRef, function(snapshot) {
+        const dados = snapshot.val();
+        let somaR = 0;
+        let somaD = 0;
+        let htmlTabela = "";
 
-        if (data) {
-            for (let id in data) {
-                const item = data[id];
-                if (item.t === 'receita') rec += item.v; else des += item.v;
-                const cor = item.t === 'receita' ? 'green' : 'red';
+        if (dados) {
+            // Transformar em array para inverter a ordem (mais novos primeiro)
+            const chaves = Object.keys(dados).reverse();
+            
+            chaves.forEach(function(id) {
+                const item = dados[id];
+                if (item.tipo === 'receita') {
+                    somaR += item.valor;
+                } else {
+                    somaD += item.valor;
+                }
+
+                const corValor = item.tipo === 'receita' ? '#28a745' : '#dc3545';
                 
-                html += "<tr>" +
-                    "<td>" + item.dt + "</td>" +
-                    "<td>" + item.d + "</td>" +
-                    "<td style='color:" + cor + "'>R$ " + item.v.toFixed(2) + "</td>" +
-                    "<td><button class='btn-del' onclick=\"apagar('" + id + "')\">X</button></td>" +
+                htmlTabela += "<tr>" +
+                    "<td>" + item.data + "</td>" +
+                    "<td>" + item.descricao + "</td>" +
+                    "<td style='color:" + corValor + "; font-weight:bold;'>R$ " + item.valor.toFixed(2) + "</td>" +
+                    "<td><button class='btn-excluir' onclick=\"excluir('" + id + "')\">X</button></td>" +
                 "</tr>";
-            }
+            });
         }
 
-        document.getElementById('tabela-corpo').innerHTML = html;
-        document.getElementById('display-receitas').innerText = "R$ " + rec.toFixed(2);
-        document.getElementById('display-despesas').innerText = "R$ " + des.toFixed(2);
-        document.getElementById('display-saldo').innerText = "R$ " + (rec - des).toFixed(2);
+        // Atualizar Tabela e Totais
+        document.getElementById('lista-corpo').innerHTML = htmlTabela;
+        document.getElementById('tot-r').innerText = "R$ " + somaR.toFixed(2);
+        document.getElementById('tot-d').innerText = "R$ " + somaD.toFixed(2);
+        document.getElementById('tot-s').innerText = "R$ " + (somaR - somaD).toFixed(2);
+        
+        // Estilo do Saldo
+        const corSaldo = (somaR - somaD) >= 0 ? '#3b82f6' : '#dc3545';
+        document.getElementById('tot-s').style.color = corSaldo;
     });
 
-    window.apagar = function(id) {
-        if(confirm("Excluir este item?")) {
+    // Função para Excluir Item
+    window.excluir = function(id) {
+        if(confirm("Deseja realmente excluir este lançamento?")) {
             remove(ref(db, 'transacoes/' + id));
         }
     };
