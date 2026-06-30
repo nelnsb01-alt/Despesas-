@@ -3,88 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GastoFácil</title>
+    <title>GastoFácil - Controle Financeiro</title>
     <style>
-        body { font-family: sans-serif; background: #f0f2f5; padding: 15px; margin: 0; }
-        .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); text-align: center; }
-        .resumo { display: flex; justify-content: space-around; margin-top: 10px; }
-        .valor { font-size: 1.4rem; font-weight: bold; display: block; margin-top: 5px; }
-        .receita { color: #28a745; }
-        .despesa { color: #dc3545; }
-        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
-        button { background: #007bff; color: white; border: none; font-weight: bold; cursor: pointer; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; }
-        th, td { border-bottom: 1px solid #eee; padding: 12px; text-align: left; font-size: 14px; }
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; }
+        .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #333; }
+        .saldo-container { text-align: center; margin-bottom: 20px; }
+        .saldo-valor { font-size: 24px; font-weight: bold; }
+        .receita { color: green; }
+        .despesa { color: red; }
+        input, select, button { width: 100%; padding: 10px; margin-top: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
+        button { background-color: #28a745; color: white; font-weight: bold; cursor: pointer; border: none; }
+        button:hover { background-color: #218838; }
+        table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+        th, td { border-bottom: 1px solid #ddd; padding: 10px; text-align: left; }
+        .btn-excluir { background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h2>GastoFácil</h2>
-        <div class="resumo">
-            <div><small>Receitas</small><span id="r" class="valor receita">R$ 0,00</span></div>
-            <div><small>Despesas</small><span id="d" class="valor despesa">R$ 0,00</span></div>
-        </div>
-        <hr><small>Saldo</small><span id="s" class="valor">R$ 0,00</span>
+<div class="container">
+    <h2>GastoFácil</h2>
+
+    <div class="saldo-container">
+        <div>Saldo Atual</div>
+        <div id="saldoTotal" class="saldo-valor">R$ 0,00</div>
     </div>
 
-    <div class="card">
-        <input type="text" id="desc" placeholder="Descrição">
-        <input type="number" id="val" placeholder="Valor R$">
-        <input type="date" id="data">
-        <select id="tipo"><option value="receita">Receita (+)</option><option value="despesa">Despesa (-)</option></select>
-        <button onclick="salvar()">Salvar</button>
-    </div>
+    <input type="text" id="descricao" placeholder="Descrição (ex: Aluguel)">
+    <input type="number" id="valor" placeholder="Valor (R$)">
+    <input type="date" id="data">
+    <select id="tipo">
+        <option value="receita">Receita</option>
+        <option value="despesa">Despesa</option>
+    </select>
+    <button onclick="adicionarTransicao()">Adicionar</button>
 
-    <table id="tabela">
-        <thead><tr><th>Data</th><th>Desc.</th><th>R$</th></tr></thead>
-        <tbody id="lista"></tbody>
+    <h3>Histórico</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Desc.</th>
+                <th>Valor</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="listaTransacoes"></tbody>
     </table>
+</div>
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
-    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-database.js";
+<script>
+    let transacoes = JSON.parse(localStorage.getItem('transacoes')) || [];
 
-    const config = {
-        apiKey: "AIzaSyAccacBLrvONf4PXDYAhCUoPmZQxi1PJlI",
-        authDomain: "despesas-547a2.firebaseapp.com",
-        databaseURL: "https://despesas-547a2-default-rtdb.firebaseio.com",
-        projectId: "despesas-547a2"
-    };
+    function atualizarInterface() {
+        const lista = document.getElementById('listaTransacoes');
+        const saldoElemento = document.getElementById('saldoTotal');
+        lista.innerHTML = '';
+        
+        let total = 0;
 
-    const app = initializeApp(config);
-    const db = getDatabase(app);
-    const dbRef = ref(db, 'transacoes');
+        transacoes.forEach((t, index) => {
+            const valorNumerico = parseFloat(t.valor);
+            if (t.tipo === 'receita') {
+                total += valorNumerico;
+            } else {
+                total -= valorNumerico;
+            }
 
-    window.salvar = function() {
-        const desc = document.getElementById('desc').value;
-        const val = parseFloat(document.getElementById('val').value);
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${t.data}</td>
+                <td>${t.descricao}</td>
+                <td class="\({t.tipo === 'receita' ? 'receita' : 'despesa'}">R\) ${valorNumerico.toFixed(2)}</td>
+                <td><button class="btn-excluir" onclick="removerTransicao(${index})">X</button></td>
+            `;
+            lista.appendChild(row);
+        });
+
+        saldoElemento.innerText = `R\( \){total.toFixed(2)}`;
+        saldoElemento.className = `saldo-valor ${total >= 0 ? 'receita' : 'despesa'}`;
+        
+        localStorage.setItem('transacoes', JSON.stringify(transacoes));
+    }
+
+    function adicionarTransicao() {
+        const descricao = document.getElementById('descricao').value;
+        const valor = document.getElementById('valor').value;
         const data = document.getElementById('data').value;
         const tipo = document.getElementById('tipo').value;
 
-        if(desc && val && data) {
-            push(dbRef, { desc, val, data, tipo }).then(() => {
-                document.getElementById('desc').value = "";
-                document.getElementById('val').value = "";
-            });
-        } else { alert("Preencha tudo!"); }
-    };
-
-    onValue(dbRef, (snap) => {
-        const dados = snap.val();
-        let tr = 0, td = 0, html = "";
-        if(dados) {
-            Object.keys(dados).reverse().forEach(k => {
-                const i = dados[k];
-                if(i.tipo === 'receita') tr += i.val; else td += i.val;
-                html += "<tr><td>" + i.data + "</td><td>" + i.desc + "</td><td>R$ " + i.val.toFixed(2) + "</td></tr>";
-            });
+        if (descricao === '' || valor === '' || data === '') {
+            alert("Por favor, preencha todos os campos!");
+            return;
         }
-        document.getElementById('lista').innerHTML = html;
-        document.getElementById('r').innerText = "R$ " + tr.toFixed(2);
-        document.getElementById('d').innerText = "R$ " + td.toFixed(2);
-        document.getElementById('s').innerText = "R$ " + (tr - td).toFixed(2);
-    });
+
+        const novaTransicao = { descricao, valor, data, tipo };
+        transacoes.push(novaTransicao);
+        atualizarInterface();
+
+        document.getElementById('descricao').value = '';
+        document.getElementById('valor').value = '';
+        document.getElementById('data').value = '';
+    }
+
+    function removerTransicao(index) {
+        if (confirm("Deseja excluir esta transação?")) {
+            transacoes.splice(index, 1);
+            atualizarInterface();
+        }
+    }
+
+    // Carregar dados ao abrir a página
+    atualizarInterface();
 </script>
+
 </body>
 </html>
