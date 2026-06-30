@@ -22,7 +22,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             overflow-x: hidden;
-            padding-bottom: 80px;
+            padding-bottom: 40px; /* Ajustado já que não há mais o banner fixo */
         }
 
         .container {
@@ -538,86 +538,6 @@
         .alert-error { background-color: #ef4444; }
         .alert-info { background-color: #3b82f6; }
 
-        /* Anúncio Fixo no Rodapé */
-        .anuncio-rodape {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: linear-gradient(135deg, #ff6b00 0%, #ff8c00 50%, #ff6b00 100%);
-            background-size: 200% 200%;
-            animation: gradienteAnimado 3s ease infinite;
-            z-index: 1000;
-            padding: 12px 20px;
-            box-shadow: 0 -4px 15px rgba(255, 107, 0, 0.4);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.3s ease;
-            border-top: 3px solid #ffd700;
-        }
-
-        .anuncio-rodape:hover {
-            background: linear-gradient(135deg, #ff7b00 0%, #ff9d00 50%, #ff7b00 100%);
-            box-shadow: 0 -6px 20px rgba(255, 107, 0, 0.6);
-            padding: 14px 20px;
-        }
-
-        .anuncio-link {
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 1.1em;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-        }
-
-        .anuncio-icone {
-            font-size: 1.3em;
-            animation: pulsar 1.5s ease infinite;
-        }
-
-        .anuncio-texto {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 6px 15px;
-            border-radius: 20px;
-            backdrop-filter: blur(5px);
-            transition: all 0.3s ease;
-        }
-
-        .anuncio-rodape:hover .anuncio-texto {
-            background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.05);
-        }
-
-        .anuncio-brilho {
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            animation: brilho 2s infinite;
-        }
-
-        @keyframes gradienteAnimado {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        @keyframes pulsar {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-        }
-
-        @keyframes brilho {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-
         @media (max-width: 768px) {
             .form-group {
                 grid-template-columns: 1fr;
@@ -645,10 +565,6 @@
                 font-size: 1.2em;
             }
 
-            .anuncio-link {
-                font-size: 0.9em;
-            }
-
             .logo-brand-name {
                 font-size: 22px;
             }
@@ -656,17 +572,14 @@
     </style>
 </head>
 <body>
-    <!-- Container de Alertas Flutuantes -->
     <div id="alertContainer" class="custom-alert"></div>
 
-    <!-- Botão Menu Hambúrguer -->
     <button class="menu-toggle" id="menuToggleBtn" onclick="toggleMenu()">
         <span></span>
         <span></span>
         <span></span>
     </button>
 
-    <!-- Menu Lateral -->
     <div class="side-menu" id="sideMenu">
         <div class="menu-header">
             <div style="margin-bottom: 15px;">
@@ -714,11 +627,9 @@
         </ul>
     </div>
 
-    <!-- Overlay -->
     <div class="overlay" id="overlay" onclick="fecharMenu()"></div>
 
     <div class="container">
-        <!-- Header com Logo e data -->
         <div class="main-header">
             <div class="logo-header">
                 <svg class="logo-icon-small" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -741,9 +652,6 @@
             <div class="data-atual" id="dataAtualTxt">--/--/----</div>
         </div>
 
-        <!-- Seções do Sistema -->
-
-        <!-- 1. DASHBOARD -->
         <div id="secao-dashboard" class="secao active">
             <div class="mes-navegacao">
                 <button onclick="mudarMes(-1)">◀ <span>Mês Anterior</span></button>
@@ -776,7 +684,6 @@
             </div>
         </div>
 
-        <!-- 2. ADICIONAR LANÇAMENTO -->
         <div id="secao-adicionar" class="secao">
             <div class="card">
                 <h3 id="formTitulo">Novo Lançamento</h3>
@@ -807,7 +714,6 @@
             </div>
         </div>
 
-        <!-- 3. LANÇAMENTOS POR MÊS -->
         <div id="secao-lancamentos" class="secao">
             <div class="card">
                 <h3>Registros Cadastrados no Período</h3>
@@ -825,7 +731,6 @@
                             </tr>
                         </thead>
                         <tbody id="tabelaPrincipalBody">
-                            <!-- Inserido dinamicamente -->
                         </tbody>
                     </table>
                     <div id="semDadosTabela" class="sem-lancamentos" style="display:none;">
@@ -835,7 +740,6 @@
             </div>
         </div>
 
-        <!-- 4. FILTROS AVANÇADOS -->
         <div id="secao-filtros" class="secao">
             <div class="card">
                 <h3>Busca e Filtragem Avançada</h3>
@@ -876,7 +780,6 @@
             </div>
         </div>
 
-        <!-- 5. RELATÓRIO MENSAL -->
         <div id="secao-relatorio" class="secao">
             <div class="card">
                 <h3>Análise e Fechamento Contábil</h3>
@@ -904,21 +807,11 @@
 
     </div>
 
-    <!-- Anúncio Fixo no Rodapé -->
-    <div class="anuncio-rodape">
-        <div class="anuncio-brilho"></div>
-        <a href="https://www.google.com" target="_blank" class="anuncio-link">
-            <span class="anuncio-icone">🚀</span>
-            <span class="anuncio-texto">GastoFácil PRO: Desbloqueie relatórios avançados e gráficos exclusivos clicando aqui!</span>
-        </a>
-    </div>
-
-    <!-- SCRIPTS CONFIGURAÇÃO DO FIREBASE (V10 MODULAR COMPATÍVEL VIA CDN) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // Configuração original do seu aplicativo Firebase
+        // Configuração do Firebase do seu projeto
         const firebaseConfig = {
           apiKey: "AIzaSyAccacBLrvONf4PXDYAhCUoPmZQxi1PJlI",
           authDomain: "despesas-547a2.firebaseapp.com",
@@ -928,13 +821,13 @@
           appId: "1:597868249062:web:915afcfa0c546396cae027"
         };
 
-        // Inicializando conexões estruturadas
+        // Inicializando conexões
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
         // VARIÁVEIS DE CONTROLE DE ESTADO GLOBAL
         let lancamentosGlobais = {};
-        let dataAlvo = new Date(2026, 0, 1); // Alinhado ao ano de 2026
+        let dataAlvo = new Date(2026, 0, 1); // Definido em 2026
 
         const mesesNomes = [
             "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -953,11 +846,11 @@
             escutarLancamentosFirebase();
         });
 
-        // NOTIFICAÇÕES ALERT CUSTOMIZADAS
+        // NOTIFICAÇÕES ALERT CUSTOMIZADAS (CORRIGIDA)
         function mostrarNotificacao(mensagem, tipo = 'success') {
             const container = document.getElementById('alertContainer');
             container.className = `custom-alert alert-${tipo} show`;
-            container.innerHTML = mensaje = mensagem;
+            container.innerHTML = mensagem;
             setTimeout(() => {
                 container.classList.remove('show');
             }, 3500);
@@ -1006,7 +899,6 @@
             }, (error) => {
                 mostrarNotificacao("Erro de sincronização. Verifique suas regras no console do Firebase.", "error");
                 console.error("Erro reportado pelo Firebase Realtime Database:", error.message);
-                console.warn("DICA: Certifique-se de que configurou as regras na aba 'Rules' do painel do Firebase para '.read': true e '.write': true.");
             });
         }
 
@@ -1089,7 +981,7 @@
                     No mês de <strong>${mesesNomes[dataAlvo.getMonth()]} de ${dataAlvo.getFullYear()}</strong>, o sistema computou um volume operacional bruto de entradas de 
                     ${formatarMoeda(totalReceitas)}, contrapondo as despesas que somaram ${formatarMoeda(totalDespesas)}. 
                     Isso gerou um saldo final consolidado de <strong style="color: ${saldo >= 0 ? '#3b82f6':'#ef4444'};">${formatarMoeda(saldo)}</strong>.<br><br>
-                    Ates o presente momento, você possui o equivalente a <strong>${formatarMoeda(previsaoPendenteDespesa)}</strong> em compromissos pendentes de quitação.
+                    Até o presente momento, você possui o equivalente a <strong>${formatarMoeda(previsaoPendenteDespesa)}</strong> em compromissos pendentes de quitação.
                 `;
             }
 
@@ -1135,8 +1027,8 @@
             const novoStatus = statusAtual === 'pago' ? 'pendente' : 'pago';
             const itemRef = ref(db, `lancamentos/${id}`);
             update(itemRef, { status: novoStatus })
-            .then(() => mostrarNotificacao("Status atualizado com sucesso!"))
-            .catch(() => mostrarNotificacao("Erro de gravação. Verifique as regras do Firebase.", "error"));
+            .then(() => mostrarNotificacao("Status updated successfully!"))
+            .catch(() => mostrarNotificacao("Erro de gravação no banco de dados.", "error"));
         }
 
         // SALVAR OU ATUALIZAR LANÇAMENTO
