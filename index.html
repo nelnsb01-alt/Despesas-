@@ -22,7 +22,7 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             overflow-x: hidden;
-            padding-bottom: 40px; /* Ajustado já que não há mais o banner fixo */
+            padding-bottom: 40px;
         }
 
         .container {
@@ -31,7 +31,7 @@
             padding: 20px;
         }
 
-        /* Botão Menu Hambúrguer - no topo */
+        /* Botão Menu Hambúrguer */
         .menu-toggle {
             position: fixed;
             top: 20px;
@@ -76,7 +76,7 @@
             transform: rotate(-45deg) translate(6px, -6px);
         }
 
-        /* Menu Lateral Oculto */
+        /* Menu Lateral */
         .side-menu {
             position: fixed;
             top: 0;
@@ -154,19 +154,28 @@
             display: block;
         }
 
-        /* Logo no Header */
+        /* Cabeçalho Compactado */
+        .main-header {
+            background: white;
+            border-radius: 15px;
+            padding: 10px 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
         .logo-header {
             display: flex;
             align-items: center;
-            justify-content: center;
-            gap: 15px;
-            padding: 10px;
-            margin-bottom: 15px;
+            gap: 10px;
         }
 
         .logo-icon-small {
-            width: 50px;
-            height: 50px;
+            width: 32px;
+            height: 32px;
         }
 
         .logo-text-group {
@@ -174,7 +183,7 @@
         }
 
         .logo-brand-name {
-            font-size: 28px;
+            font-size: 20px;
             font-weight: 800;
             color: var(--dark-blue);
             line-height: 1;
@@ -182,28 +191,16 @@
         }
 
         .logo-tagline {
-            font-size: 12px;
+            font-size: 11px;
             color: #666;
-            margin: 2px 0 0 0;
+            margin: 1px 0 0 0;
             font-weight: 500;
-        }
-
-        /* Header com data */
-        .main-header {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 30px;
-            margin-top: 0px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            text-align: center;
         }
 
         .data-atual {
-            font-size: 1.1em;
-            color: #666;
+            font-size: 0.95em;
+            color: #555;
             font-weight: 500;
-            margin-top: 10px;
         }
 
         /* Dashboard */
@@ -243,7 +240,7 @@
         .card-dashboard.despesas .valor { color: #ef4444; }
         .card-dashboard.saldo .valor { color: #3b82f6; }
 
-        /* Lembretes */
+        /* Lembretes e Painéis de Contas */
         .lembretes-panel {
             background: white;
             border-radius: 15px;
@@ -261,6 +258,23 @@
             gap: 10px;
         }
 
+        .pagas-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #10b981;
+        }
+
+        .pagas-panel h3 {
+            color: #10b981;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         .lembrete-item {
             background: #fffbeb;
             padding: 12px;
@@ -270,6 +284,17 @@
             justify-content: space-between;
             align-items: center;
             border-left: 3px solid #f59e0b;
+        }
+
+        .paga-item {
+            background: #f0fdf4;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 3px solid #10b981;
         }
 
         .card {
@@ -404,15 +429,6 @@
             margin-top: 20px;
         }
 
-        .relatorio-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
         .resumo-stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -427,13 +443,7 @@
             text-align: center;
         }
 
-        .mes-nav button {
-            background: #e5e7eb;
-            color: #333;
-            padding: 8px 15px;
-        }
-
-        /* Estilo profissional para navegação do mês */
+        /* Navegação do mês */
         .mes-navegacao {
             display: flex;
             justify-content: space-between;
@@ -494,7 +504,6 @@
             margin-top: 3px;
         }
 
-        /* Indicador de meses sem lançamentos */
         .sem-lancamentos {
             text-align: center;
             padding: 40px;
@@ -502,11 +511,6 @@
             background: #f9fafb;
             border-radius: 10px;
             font-size: 1.1em;
-        }
-
-        /* Categoria com apenas ícones */
-        .categoria-icon {
-            font-size: 1.2em;
         }
 
         .secao {
@@ -539,6 +543,12 @@
         .alert-info { background-color: #3b82f6; }
 
         @media (max-width: 768px) {
+            .main-header {
+                flex-direction: column;
+                gap: 8px;
+                text-align: center;
+            }
+
             .form-group {
                 grid-template-columns: 1fr;
             }
@@ -566,7 +576,7 @@
             }
 
             .logo-brand-name {
-                font-size: 22px;
+                font-size: 18px;
             }
         }
     </style>
@@ -619,10 +629,7 @@
                 <span>📈</span> <span>Relatório Mensal</span>
             </li>
             <li onclick="exportarDados(); fecharMenu()">
-                <span>💾</span> <span>Exportar Dados</span>
-            </li>
-            <li onclick="limparTodosDados(); fecharMenu()">
-                <span>🗑️</span> <span>Limpar Tudo</span>
+                <span>📄</span> <span>Exportar PDF</span>
             </li>
         </ul>
     </div>
@@ -657,8 +664,8 @@
                 <button onclick="mudarMes(-1)">◀ <span>Mês Anterior</span></button>
                 <div class="mes-destaque">
                     <span class="mes-label">Visualizando Período</span>
-                    <span class="mes-nome" id="dashMesNome">Janeiro</span>
-                    <span class="mes-ano" id="dashAnoNome">2026</span>
+                    <span class="mes-nome" id="dashMesNome">--</span>
+                    <span class="mes-ano" id="dashAnoNome">----</span>
                 </div>
                 <button onclick="mudarMes(1)"><span>Próximo Mês</span> ▶</button>
             </div>
@@ -669,7 +676,7 @@
                     <div class="valor" id="dashReceitas">R$ 0,00</div>
                 </div>
                 <div class="card-dashboard despesas">
-                    <h3>Despesas</h3>
+                    <h3>Despesas (Pendente)</h3>
                     <div class="valor" id="dashDespesas">R$ 0,00</div>
                 </div>
                 <div class="card-dashboard saldo">
@@ -681,6 +688,11 @@
             <div class="lembretes-panel" id="lembretesPanel" style="display:none;">
                 <h3>🔔 Atenção: Contas Pendentes no Mês</h3>
                 <div id="listaLembretes"></div>
+            </div>
+
+            <div class="pagas-panel" id="pagasPanel" style="display:none;">
+                <h3>✅ Dívidas Quitadas no Mês</h3>
+                <div id="listaPagas"></div>
             </div>
         </div>
 
@@ -811,7 +823,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // Configuração do Firebase do seu projeto
         const firebaseConfig = {
           apiKey: "AIzaSyAccacBLrvONf4PXDYAhCUoPmZQxi1PJlI",
           authDomain: "despesas-547a2.firebaseapp.com",
@@ -821,13 +832,11 @@
           appId: "1:597868249062:web:915afcfa0c546396cae027"
         };
 
-        // Inicializando conexões
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // VARIÁVEIS DE CONTROLE DE ESTADO GLOBAL
         let lancamentosGlobais = {};
-        let dataAlvo = new Date(2026, 0, 1); // Definido em 2026
+        let dataAlvo = new Date(); 
 
         const mesesNomes = [
             "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -839,24 +848,21 @@
             despesa: ["Alimentação", "Moradia", "Transporte", "Saúde", "Educação", "Lazer", "Outros"]
         };
 
-        // INICIALIZAÇÃO DA APLICAÇÃO
         window.addEventListener('DOMContentLoaded', () => {
             configurarDataAtual();
             atualizarInterfaceMes();
             escutarLancamentosFirebase();
         });
 
-        // NOTIFICAÇÕES ALERT CUSTOMIZADAS (CORRIGIDA)
         function mostrarNotificacao(mensagem, tipo = 'success') {
             const container = document.getElementById('alertContainer');
             container.className = `custom-alert alert-${tipo} show`;
-            container.innerHTML = mensagem;
+            container.innerHTML = message;
             setTimeout(() => {
                 container.classList.remove('show');
             }, 3500);
         }
 
-        // FORMATADORES AUXILIARES
         function formatarMoeda(valor) {
             return parseFloat(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
@@ -874,7 +880,6 @@
             document.getElementById('dataAtualTxt').innerText = formatada.charAt(0).toUpperCase() + formatada.slice(1);
         }
 
-        // NAVEGAÇÃO DOS MESES
         window.mudarMes = function(direcao) {
             dataAlvo.setMonth(dataAlvo.getMonth() + direcao);
             atualizarInterfaceMes();
@@ -889,7 +894,6 @@
             document.getElementById('dashAnoNome').innerText = anoCorrente;
         }
 
-        // ESCUTAR MUDANÇAS DO FIREBASE EM TEMPO REAL
         function escutarLancamentosFirebase() {
             const DBRef = ref(db, 'lancamentos');
             onValue(DBRef, (snapshot) => {
@@ -897,24 +901,23 @@
                 lancamentosGlobais = dados ? dados : {};
                 processarDadosEAtualizarTelas();
             }, (error) => {
-                mostrarNotificacao("Erro de sincronização. Verifique suas regras no console do Firebase.", "error");
-                console.error("Erro reportado pelo Firebase Realtime Database:", error.message);
+                mostrarNotificacao("Erro de sincronização.", "error");
+                console.error(error.message);
             });
         }
 
-        // MAPEAMENTO E CÁLCULO FINANCEIRO
         function processarDadosEAtualizarTelas() {
             const mesFiltro = (dataAlvo.getMonth() + 1).toString().padStart(2, '0');
             const anoFiltro = dataAlvo.getFullYear().toString();
 
             let totalReceitas = 0;
-            let totalDespesas = 0;
             let totalRecebido = 0;
             let totalPago = 0;
             let previsaoPendenteDespesa = 0;
 
             const listaFiltradaMes = [];
             const lembretesPendentes = [];
+            const lembretesPagas = [];
 
             Object.keys(lancamentosGlobais).forEach(id => {
                 const item = lancamentosGlobais[id];
@@ -931,26 +934,30 @@
                             totalReceitas += valorNum;
                             if (cloneItem.status === 'pago') totalRecebido += valorNum;
                         } else if (cloneItem.tipo === 'despesa') {
-                            totalDespesas += valorNum;
-                            if (cloneItem.status === 'pago') totalPago += valorNum;
+                            if (cloneItem.status === 'pago') {
+                                totalPago += valorNum;
+                                lembretesPagas.push(cloneItem); // Adiciona na lista de pagas
+                            }
                             if (cloneItem.status === 'pendente') {
                                 previsaoPendenteDespesa += valorNum;
-                                lembretesPendentes.push(cloneItem);
+                                lembretesPendentes.push(cloneItem); // Adiciona na lista de pendentes
                             }
                         }
                     }
                 }
             });
 
-            // 1. Renderiza Dashboard Principal
             document.getElementById('dashReceitas').innerText = formatarMoeda(totalReceitas);
-            document.getElementById('dashDespesas').innerText = formatarMoeda(totalDespesas);
-            const saldo = totalReceitas - totalDespesas;
+            
+            // Modificação 1: O card Despesas agora mostra apenas o valor pendente bruto (abatido das pagas)
+            document.getElementById('dashDespesas').innerText = formatarMoeda(previsaoPendenteDespesa);
+            
+            const saldo = totalRecebido - totalPago;
             const elementoSaldo = document.getElementById('dashSaldo');
             elementoSaldo.innerText = formatarMoeda(saldo);
             elementoSaldo.style.color = saldo >= 0 ? '#3b82f6' : '#ef4444';
 
-            // 2. Renderiza Lembretes
+            // Renderiza Lembretes Pendentes
             const painelLembretes = document.getElementById('lembretesPanel');
             const listaLembretesHTML = document.getElementById('listaLembretes');
             if (lembretesPendentes.length > 0) {
@@ -965,10 +972,23 @@
                 painelLembretes.style.display = 'none';
             }
 
-            // 3. Renderiza Tabela Principal do Mês
+            // Modificação 3: Exibir as dívidas pagas em uma seção logo abaixo das pendentes
+            const painelPagas = document.getElementById('pagasPanel');
+            const listaPagasHTML = document.getElementById('listaPagas');
+            if (lembretesPagas.length > 0) {
+                painelPagas.style.display = 'block';
+                listaPagasHTML.innerHTML = lembretesPagas.map(item => `
+                    <div class="paga-item">
+                        <span><strong>${item.descricao}</strong> (${item.categoria}) - Paga em: ${formatarDataBR(item.data)}</span>
+                        <span style="color:#10b981; font-weight:bold;">${formatarMoeda(item.valor)}</span>
+                    </div>
+                `).join('');
+            } else {
+                painelPagas.style.display = 'none';
+            }
+
             renderizarTabelaPrincipal(listaFiltradaMes);
 
-            // 4. Renderiza Relatório do Período
             document.getElementById('repTotalRecebido').innerText = formatarMoeda(totalRecebido);
             document.getElementById('repTotalPago').innerText = formatarMoeda(totalPago);
             document.getElementById('repPrevisaoPendente').innerText = formatarMoeda(previsaoPendenteDespesa);
@@ -979,16 +999,14 @@
             } else {
                 fechamentoTexto.innerHTML = `
                     No mês de <strong>${mesesNomes[dataAlvo.getMonth()]} de ${dataAlvo.getFullYear()}</strong>, o sistema computou um volume operacional bruto de entradas de 
-                    ${formatarMoeda(totalReceitas)}, contrapondo as despesas que somaram ${formatarMoeda(totalDespesas)}. 
-                    Isso gerou um saldo final consolidado de <strong style="color: ${saldo >= 0 ? '#3b82f6':'#ef4444'};">${formatarMoeda(saldo)}</strong>.<br><br>
-                    Até o presente momento, você possui o equivalente a <strong>${formatarMoeda(previsaoPendenteDespesa)}</strong> em compromissos pendentes de quitação.
+                    ${formatarMoeda(totalReceitas)}. Suas obrigações pendentes em aberto somam ${formatarMoeda(previsaoPendenteDespesa)}. 
+                    Isso gerou um saldo corrente em conta (líquido quitado) de <strong style="color: ${saldo >= 0 ? '#3b82f6':'#ef4444'};">${formatarMoeda(saldo)}</strong>.
                 `;
             }
 
             aplicarFiltrosAvancados();
         }
 
-        // RENDERIZAÇÃO DA TABELA DE LANÇAMENTOS POR MÊS
         function renderizarTabelaPrincipal(lista) {
             const tbody = document.getElementById('tabelaPrincipalBody');
             const placeholder = document.getElementById('semDadosTabela');
@@ -1022,19 +1040,16 @@
             `).join('');
         }
 
-        // ALTERNAR STATUS (PAGO/PENDENTE)
         window.alternarStatusDoLancamento = function(id, statusAtual) {
             const novoStatus = statusAtual === 'pago' ? 'pendente' : 'pago';
             const itemRef = ref(db, `lancamentos/${id}`);
             update(itemRef, { status: novoStatus })
-            .then(() => mostrarNotificacao("Status updated successfully!"))
-            .catch(() => mostrarNotificacao("Erro de gravação no banco de dados.", "error"));
+            .then(() => mostrarNotificacao("Status atualizado!"))
+            .catch(() => mostrarNotificacao("Erro de gravação.", "error"));
         }
 
-        // SALVAR OU ATUALIZAR LANÇAMENTO
         window.salvarLancamento = function(e) {
             e.preventDefault();
-
             const id = document.getElementById('lancamentoId').value;
             const dadosForm = {
                 descricao: document.getElementById('descricao').value.trim(),
@@ -1045,50 +1060,37 @@
                 status: document.getElementById('status').value
             };
 
-            if(!dadosForm.tipo || !dadosForm.categoria) {
-                mostrarNotificacao("Por favor, preencha o Tipo e a Categoria.", "error");
-                return;
-            }
-
             if(id) {
                 const itemRef = ref(db, `lancamentos/${id}`);
-                set(itemRef, dadosForm)
-                .then(() => {
-                    mostrarNotificacao("Lançamento atualizado com sucesso!");
+                set(itemRef, dadosForm).then(() => {
+                    mostrarNotificacao("Lançamento atualizado!");
                     cancelarEdicao();
                     mostrarSecao('lancamentos');
-                }).catch(() => mostrarNotificacao("Erro de permissão para atualizar dados.", "error"));
+                });
             } else {
                 const colecaoRef = ref(db, 'lancamentos');
-                const novoRegistroRef = push(colecaoRef);
-                set(novoRegistroRef, dadosForm)
-                .then(() => {
-                    mostrarNotificacao("Lançamento gravado com sucesso!");
+                push(colecaoRef, dadosForm).then(() => {
+                    mostrarNotificacao("Lançamento gravado!");
                     document.getElementById('financeForm').reset();
                     mostrarSecao('lancamentos');
-                }).catch(() => mostrarNotificacao("Erro de permissão para salvar no Firebase.", "error"));
+                });
             }
         }
 
-        // EDICAO DE REGISTROS
         window.carregarLancamentoParaEdicao = function(id) {
             const item = lancamentosGlobais[id];
             if(!item) return;
-
             document.getElementById('lancamentoId').value = id;
             document.getElementById('descricao').value = item.descricao;
             document.getElementById('valor').value = item.valor;
             document.getElementById('data').value = item.data;
             document.getElementById('tipo').value = item.tipo;
-            
             atualizarCategorias();
             document.getElementById('categoria').value = item.categoria;
             document.getElementById('status').value = item.status;
-
             document.getElementById('formTitulo').innerText = "Editando Lançamento";
             document.getElementById('btnSalvar').innerText = "Salvar Alterações";
             document.getElementById('btnCancelarEdicao').style.display = "inline-block";
-
             mostrarSecao('adicionar');
         }
 
@@ -1101,33 +1103,15 @@
             atualizarCategorias();
         }
 
-        // DELETAR LANÇAMENTO
         window.deletarLancamento = function(id) {
-            if(confirm("Tem certeza que deseja remover permanentemente este registro?")) {
-                const itemRef = ref(db, `lancamentos/${id}`);
-                remove(itemRef)
-                .then(() => mostrarNotificacao("Registro removido com sucesso!", "info"))
-                .catch(() => mostrarNotificacao("Erro de permissão para excluir no Firebase.", "error"));
+            if(confirm("Deseja remover este registro?")) {
+                remove(ref(db, `lancamentos/${id}`)).then(() => mostrarNotificacao("Removido com sucesso!", "info"));
             }
         }
 
-        // LIMPAR TUDO
-        window.limparTodosDados = function() {
-            if(confirm("ATENÇÃO: Isso apagará TODOS os registros armazenados no Firebase do projeto. Confirma?")) {
-                const tudoRef = ref(db, 'lancamentos');
-                set(tudoRef, null)
-                .then(() => {
-                    mostrarNotificacao("Toda a base de dados foi resetada.", "info");
-                    mostrarSecao('dashboard');
-                }).catch(() => mostrarNotificacao("Falha na gravação. Verifique as regras de segurança.", "error"));
-            }
-        }
-
-        // ATUALIZAÇÃO COMBINADA DAS CATEGORIAS
         window.atualizarCategorias = function() {
             const tipo = document.getElementById('tipo').value;
             const selectCat = document.getElementById('categoria');
-            
             selectCat.innerHTML = '<option value="">Selecione a Categoria</option>';
             if(tipo && categoriasDefinidas[tipo]) {
                 categoriasDefinidas[tipo].forEach(cat => {
@@ -1136,7 +1120,6 @@
             }
         }
 
-        // FILTROS AVANÇADOS
         window.aplicarFiltrosAvancados = function() {
             const secaoFiltros = document.getElementById('secao-filtros');
             if (!secaoFiltros.classList.contains('active')) return;
@@ -1147,20 +1130,16 @@
             const tbody = document.getElementById('tabelaFiltrosBody');
 
             const filtrados = [];
-
             Object.keys(lancamentosGlobais).forEach(id => {
                 const item = lancamentosGlobais[id];
                 const condTexto = !texto || item.descricao.toLowerCase().includes(texto) || item.categoria.toLowerCase().includes(texto);
                 const condTipo = tipo === 'todos' || item.tipo === tipo;
                 const condStatus = status === 'todos' || item.status === status;
-
-                if (condTexto && condTipo && condStatus) {
-                    filtrados.push(item);
-                }
+                if (condTexto && condTipo && condStatus) filtrados.push(item);
             });
 
             if(filtrados.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#999;">Nenhum resultado correspondente localizado.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#999;">Nenhum resultado localizado.</td></tr>`;
                 return;
             }
 
@@ -1172,11 +1151,7 @@
                     <td>${item.categoria}</td>
                     <td style="font-weight:600; color:${item.tipo === 'receita' ? '#10b981':'#ef4444'}">${item.tipo.toUpperCase()}</td>
                     <td style="font-weight:bold;">${formatarMoeda(item.valor)}</td>
-                    <td>
-                        <span class="status-badge ${item.status === 'pago' ? 'status-pago':'status-pendente'}">
-                            ${item.status === 'pago' ? 'Pago' : 'Pendente'}
-                        </span>
-                    </td>
+                    <td><span class="status-badge ${item.status === 'pago' ? 'status-pago':'status-pendente'}">${item.status === 'pago' ? 'Pago' : 'Pendente'}</span></td>
                 </tr>
             `).join('');
         }
@@ -1188,48 +1163,86 @@
             aplicarFiltrosAvancados();
         }
 
-        // EXPORTAR DADOS
+        // Modificação 2: Exportar Relatório Consolidado diretamente em PDF formatado
         window.exportarDados = function() {
-            if(Object.keys(lancamentosGlobais).length === 0) {
-                mostrarNotificacao("Não existem dados disponíveis para exportação.", "error");
+            const mesFiltro = (dataAlvo.getMonth() + 1).toString().padStart(2, '0');
+            const anoFiltro = dataAlvo.getFullYear().toString();
+            
+            let linhasHtml = '';
+            let totalRec = 0, totalDes = 0;
+
+            Object.keys(lancamentosGlobais).forEach(id => {
+                const item = lancamentosGlobais[id];
+                if (item.data && item.data.startsWith(`${anoFiltro}-${mesFiltro}`)) {
+                    const v = parseFloat(item.valor) || 0;
+                    if(item.tipo === 'receita') totalRec += v; else totalDes += v;
+                    linhasHtml += `
+                        <tr>
+                            <td style="padding:8px; border-bottom:1px solid #ddd;">${formatarDataBR(item.data)}</td>
+                            <td style="padding:8px; border-bottom:1px solid #ddd;">${item.descricao}</td>
+                            <td style="padding:8px; border-bottom:1px solid #ddd;">${item.categoria}</td>
+                            <td style="padding:8px; border-bottom:1px solid #ddd; color:${item.tipo==='receita'?'green':'red'}">${item.tipo.toUpperCase()}</td>
+                            <td style="padding:8px; border-bottom:1px solid #ddd; font-weight:bold;">${formatarMoeda(item.valor)}</td>
+                            <td style="padding:8px; border-bottom:1px solid #ddd;">${item.status.toUpperCase()}</td>
+                        </tr>`;
+                }
+            });
+
+            if(linhasHtml === '') {
+                mostrarNotificacao("Não há dados para exportar neste mês.", "error");
                 return;
             }
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(lancamentosGlobais, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `gastofacil_backup_2026.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-            mostrarNotificacao("Arquivo JSON gerado e baixado!", "success");
+
+            const janelaImpressao = window.open('', '_blank');
+            janelaImpressao.document.write(`
+                <html>
+                <head>
+                    <title>Relatório Financeiro - ${mesesNomes[dataAlvo.getMonth()]} / ${anoFiltro}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; color: #333; }
+                        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #1a365d; padding-bottom: 10px; }
+                        .resumo { display: flex; justify-content: space-between; background: #f4f6f9; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                        th { background: #1a365d; color: white; padding: 10px; text-align: left; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h2>GastoFácil - Relatório de Controle Financeiro</h2>
+                        <p>Competência: ${mesesNomes[dataAlvo.getMonth()]} de ${anoFiltro} | Gerado em: ${new Date().toLocaleDateString('pt-BR')}</p>
+                    </div>
+                    <div class="resumo">
+                        <div><strong>Total Receitas:</strong> ${formatarMoeda(totalRec)}</div>
+                        <div><strong>Total Despesas Bruto:</strong> ${formatarMoeda(totalDes)}</div>
+                        <div><strong>Saldo Líquido Período:</strong> ${formatarMoeda(totalRec - totalDes)}</div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Tipo</th><th>Valor</th><th>Status</th></tr>
+                        </thead>
+                        <tbody>${linhasHtml}</tbody>
+                    </table>
+                    <script>window.onload = function() { window.print(); window.close(); }</s` + `cript>
+                </body>
+                </html>
+            `);
+            janelaImpressao.document.close();
         }
 
-        // NAVEGAÇÃO DE SEÇÕES E MENU SIDEBAR
         window.mostrarSecao = function(secaoId) {
             document.querySelectorAll('.secao').forEach(sec => sec.classList.remove('active'));
             document.getElementById(`secao-${secaoId}`).classList.add('active');
-
             const indexMapeamento = { 'dashboard': 0, 'adicionar': 1, 'lancamentos': 2, 'filtros': 3, 'relatorio': 4 };
             const listaItensMenu = document.querySelectorAll('.menu-items-side li');
-            
             listaItensMenu.forEach(li => li.classList.remove('active'));
-            if(indexMapeamento[secaoId] !== undefined) {
-                listaItensMenu[indexMapeamento[secaoId]].classList.add('active');
-            }
-
-            if(secaoId === 'filtros') {
-                aplicarFiltrosAvancados();
-            }
+            if(indexMapeamento[secaoId] !== undefined) listaItensMenu[indexMapeamento[secaoId]].classList.add('active');
+            if(secaoId === 'filtros') aplicarFiltrosAvancados();
         }
 
         window.toggleMenu = function() {
-            const menu = document.getElementById('sideMenu');
-            const toggle = document.getElementById('menuToggleBtn');
-            const overlay = document.getElementById('overlay');
-            
-            menu.classList.toggle('open');
-            toggle.classList.toggle('active');
-            overlay.classList.toggle('active');
+            document.getElementById('sideMenu').classList.toggle('open');
+            document.getElementById('menuToggleBtn').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
         }
 
         window.fecharMenu = function() {
